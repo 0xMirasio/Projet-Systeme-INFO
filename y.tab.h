@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.7.5.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,6 +31,10 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
 #ifndef YY_YY_Y_TAB_H_INCLUDED
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
@@ -40,56 +45,63 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    TINT = 258,
-    TCHAR = 259,
-    TFLOAT = 260,
-    TMAIN = 261,
-    TPRINTF = 262,
-    TFLOATNBR = 263,
-    TNBR = 264,
-    TVAR = 265,
-    TPO = 266,
-    TPF = 267,
-    TMUL = 268,
-    TDIV = 269,
-    TMINUS = 270,
-    TPLUS = 271,
-    TSPACE = 272,
-    TRET = 273,
-    TENDOP = 274,
-    TVIR = 275,
-    TEQ = 276,
-    TAcoDeb = 277,
-    TAcoEnd = 278
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    TINT = 258,                    /* TINT  */
+    TFLOAT = 259,                  /* TFLOAT  */
+    TMAIN = 260,                   /* TMAIN  */
+    TPRINTF = 261,                 /* TPRINTF  */
+    TFLOATNBR = 262,               /* TFLOATNBR  */
+    TNBR = 263,                    /* TNBR  */
+    TVAR = 264,                    /* TVAR  */
+    TPO = 265,                     /* TPO  */
+    TPF = 266,                     /* TPF  */
+    TMUL = 267,                    /* TMUL  */
+    TDIV = 268,                    /* TDIV  */
+    TMINUS = 269,                  /* TMINUS  */
+    TPLUS = 270,                   /* TPLUS  */
+    TSPACE = 271,                  /* TSPACE  */
+    TRET = 272,                    /* TRET  */
+    TENDOP = 273,                  /* TENDOP  */
+    TVIR = 274,                    /* TVIR  */
+    TEQ = 275,                     /* TEQ  */
+    TAcoDeb = 276,                 /* TAcoDeb  */
+    TAcoEnd = 277                  /* TAcoEnd  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Tokens.  */
+/* Token kinds.  */
+#define YYEMPTY -2
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 257
 #define TINT 258
-#define TCHAR 259
-#define TFLOAT 260
-#define TMAIN 261
-#define TPRINTF 262
-#define TFLOATNBR 263
-#define TNBR 264
-#define TVAR 265
-#define TPO 266
-#define TPF 267
-#define TMUL 268
-#define TDIV 269
-#define TMINUS 270
-#define TPLUS 271
-#define TSPACE 272
-#define TRET 273
-#define TENDOP 274
-#define TVIR 275
-#define TEQ 276
-#define TAcoDeb 277
-#define TAcoEnd 278
+#define TFLOAT 259
+#define TMAIN 260
+#define TPRINTF 261
+#define TFLOATNBR 262
+#define TNBR 263
+#define TVAR 264
+#define TPO 265
+#define TPF 266
+#define TMUL 267
+#define TDIV 268
+#define TMINUS 269
+#define TPLUS 270
+#define TSPACE 271
+#define TRET 272
+#define TENDOP 273
+#define TVIR 274
+#define TEQ 275
+#define TAcoDeb 276
+#define TAcoEnd 277
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

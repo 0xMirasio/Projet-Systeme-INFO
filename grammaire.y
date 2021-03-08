@@ -1,12 +1,9 @@
 %{
-
 #include <stdio.h>
 #include <stdlib.h>
-
 %}
 
 %token TINT
-%token TCHAR
 %token TFLOAT
 %token TMAIN
 %token TPRINTF
@@ -29,14 +26,60 @@
 
 %%
 
-debut : TINT TSPACE TMAIN Space TAcoDeb Programme TAcoEnd 
-       { printf("main detecté\n"); }
+/*int main() {
+[PROGRAMME]
+}
+*/
+debut : Space Retour TINT TSPACE TMAIN Space Retour TAcoDeb Retour Programme Retour TAcoEnd Space Retour
+       { printf("[MAIN]\n"); }
        ;
-Programme : TINT 
-        { printf("Int detecté a l'interieur du main\n"); }
+
+/*
+[Entree][Var][Ope][Data];
+[Entree][Var];
+[Var][Ope][Var][Ope][Var];
+[Entree][Var][Ope][Var][Ope][Var]
+*/
+Programme : Retour Space Entree Space Var Space Ope Space Data Space TENDOP Space Retour Programme
+        { printf("[Entree][Var][Ope][Data] : %d \n", $8); }
+
+        | Retour Space Entree Space Var Space TENDOP Space Retour Programme
+         { printf("[Entree][Var];\n"); }
+
+        | Retour Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme
+        { printf("[Var][Ope][Var][Ope][Var];\n");}
+
+        | Retour Space Entree Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme
+        { printf("[Entree][Var][Ope][Var][Ope][Var]\n");}
+
+        | 
         ;
 
-Space : TSPACE | ;
+Entree : TINT { printf("Entree"); }  
+      | TFLOAT
+      |
+      ;
+Var : TVAR { printf("Var\n"); }  
+      |
+      ;
+Ope : TEQ { printf("Ope\n"); }  
+      | TDIV
+      | TMUL
+      | TMINUS
+      | TPLUS
+      | 
+      ;
+Data : TNBR { $$=$1; }  
+      | TFLOATNBR { $$=$1;}
+      | 
+      ;
+
+Space : TSPACE { printf("Space\n"); }  
+      | 
+      ;
+Retour : TRET { printf("Ret\n"); }  
+      | 
+      ;
 
 %%
 

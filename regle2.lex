@@ -4,7 +4,6 @@
 
 %%
 int { return(TINT); }
-char { return(TCHAR); }
 float { return(TFLOAT); }
 main\(\) { return(TMAIN); }
 printf\(.*\) { return(TPRINTF); }
@@ -18,7 +17,7 @@ printf\(.*\) { return(TPRINTF); }
 [\/] { return(TDIV);}
 [\*] { return(TMUL);}
 [\t ]+ { return(TSPACE); }
-"\n" { return(TRET); }
+"\n"+ { return(TRET); }
 ";" { return(TENDOP); }
 "," { return(TVIR); }
 "=" { return(TEQ); }
