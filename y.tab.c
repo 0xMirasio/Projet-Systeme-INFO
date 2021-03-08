@@ -72,7 +72,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#line 76 "y.tab.c"
+typedef struct Dico Dico;
+struct Dico {
+  char * var;              
+  double h1;
+  int h2;
+};
+
+Dico dico;
+
+
+#line 86 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -129,10 +139,9 @@ extern int yydebug;
     TSPACE = 271,                  /* TSPACE  */
     TRET = 272,                    /* TRET  */
     TENDOP = 273,                  /* TENDOP  */
-    TVIR = 274,                    /* TVIR  */
-    TEQ = 275,                     /* TEQ  */
-    TAcoDeb = 276,                 /* TAcoDeb  */
-    TAcoEnd = 277                  /* TAcoEnd  */
+    TEQ = 274,                     /* TEQ  */
+    TAcoDeb = 275,                 /* TAcoDeb  */
+    TAcoEnd = 276                  /* TAcoEnd  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -157,14 +166,21 @@ extern int yydebug;
 #define TSPACE 271
 #define TRET 272
 #define TENDOP 273
-#define TVIR 274
-#define TEQ 275
-#define TAcoDeb 276
-#define TAcoEnd 277
+#define TEQ 274
+#define TAcoDeb 275
+#define TAcoEnd 276
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 16 "grammaire.y"
+int v1; double v2; char * v3;
+
+#line 181 "y.tab.c"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -198,19 +214,18 @@ enum yysymbol_kind_t
   YYSYMBOL_TSPACE = 16,                    /* TSPACE  */
   YYSYMBOL_TRET = 17,                      /* TRET  */
   YYSYMBOL_TENDOP = 18,                    /* TENDOP  */
-  YYSYMBOL_TVIR = 19,                      /* TVIR  */
-  YYSYMBOL_TEQ = 20,                       /* TEQ  */
-  YYSYMBOL_TAcoDeb = 21,                   /* TAcoDeb  */
-  YYSYMBOL_TAcoEnd = 22,                   /* TAcoEnd  */
-  YYSYMBOL_YYACCEPT = 23,                  /* $accept  */
-  YYSYMBOL_debut = 24,                     /* debut  */
-  YYSYMBOL_Programme = 25,                 /* Programme  */
-  YYSYMBOL_Entree = 26,                    /* Entree  */
-  YYSYMBOL_Var = 27,                       /* Var  */
-  YYSYMBOL_Ope = 28,                       /* Ope  */
-  YYSYMBOL_Data = 29,                      /* Data  */
-  YYSYMBOL_Space = 30,                     /* Space  */
-  YYSYMBOL_Retour = 31                     /* Retour  */
+  YYSYMBOL_TEQ = 19,                       /* TEQ  */
+  YYSYMBOL_TAcoDeb = 20,                   /* TAcoDeb  */
+  YYSYMBOL_TAcoEnd = 21,                   /* TAcoEnd  */
+  YYSYMBOL_YYACCEPT = 22,                  /* $accept  */
+  YYSYMBOL_debut = 23,                     /* debut  */
+  YYSYMBOL_Programme = 24,                 /* Programme  */
+  YYSYMBOL_Entree = 25,                    /* Entree  */
+  YYSYMBOL_Var = 26,                       /* Var  */
+  YYSYMBOL_Ope = 27,                       /* Ope  */
+  YYSYMBOL_Data = 28,                      /* Data  */
+  YYSYMBOL_Space = 29,                     /* Space  */
+  YYSYMBOL_Retour = 30                     /* Retour  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -532,10 +547,10 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   86
+#define YYLAST   84
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  23
+#define YYNTOKENS  22
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  9
 /* YYNRULES -- Number of rules.  */
@@ -544,7 +559,7 @@ union yyalloc
 #define YYNSTATES  69
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   277
+#define YYMAXUTOK   276
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -585,16 +600,16 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22
+      15,    16,    17,    18,    19,    20,    21
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    33,    33,    43,    46,    49,    52,    55,    58,    59,
-      60,    62,    63,    65,    66,    67,    68,    69,    70,    72,
-      73,    74,    77,    78,    80,    81
+       0,    46,    46,    54,    58,    59,    60,    61,    64,    65,
+      66,    68,    69,    71,    72,    73,    74,    75,    76,    78,
+      79,    80,    83,    84,    86,    87
 };
 #endif
 
@@ -612,9 +627,9 @@ static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "TINT", "TFLOAT",
   "TMAIN", "TPRINTF", "TFLOATNBR", "TNBR", "TVAR", "TPO", "TPF", "TMUL",
-  "TDIV", "TMINUS", "TPLUS", "TSPACE", "TRET", "TENDOP", "TVIR", "TEQ",
-  "TAcoDeb", "TAcoEnd", "$accept", "debut", "Programme", "Entree", "Var",
-  "Ope", "Data", "Space", "Retour", YY_NULLPTR
+  "TDIV", "TMINUS", "TPLUS", "TSPACE", "TRET", "TENDOP", "TEQ", "TAcoDeb",
+  "TAcoEnd", "$accept", "debut", "Programme", "Entree", "Var", "Ope",
+  "Data", "Space", "Retour", YY_NULLPTR
 };
 
 static const char *
@@ -631,7 +646,7 @@ static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277
+     275,   276
 };
 #endif
 
@@ -649,13 +664,13 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -14,   -31,     3,     5,   -31,   -31,    24,    12,    25,   -14,
-       5,    15,     5,   -16,     5,   -14,    16,    22,   -14,   -31,
-     -31,   -31,   -14,   -14,     5,    31,    66,   -31,   -14,   -31,
-     -31,   -31,   -31,   -31,   -14,    57,    31,   -14,   -14,   -14,
-       5,     7,    66,   -16,   -31,   -31,   -14,   -14,   -14,   -31,
-      66,    27,    31,   -14,   -14,    28,    31,     5,   -14,    29,
-     -16,     5,   -14,   -31,   -16,     5,   -31,   -16,   -31
+     -13,   -31,    27,   -16,   -31,   -31,    19,    12,    25,   -13,
+     -16,    16,   -16,   -15,   -16,   -13,    17,    22,   -13,   -31,
+     -31,   -31,   -13,   -13,   -16,    31,    65,   -31,   -13,   -31,
+     -31,   -31,   -31,   -31,   -13,    57,    31,   -13,   -13,   -13,
+     -16,     7,    65,   -15,   -31,   -31,   -13,   -13,   -13,   -31,
+      65,    28,    31,   -13,   -13,    29,    31,   -16,   -13,    32,
+     -15,   -16,   -13,   -31,   -15,   -16,   -31,   -15,   -31
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -689,49 +704,49 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       6,     5,     1,     4,    10,    38,    -7,    11,    28,    13,
+       6,     5,     5,     1,    10,    38,    -7,    11,    28,    13,
       17,    16,    48,    24,    44,    45,    21,    25,    26,    39,
-      53,    27,     5,    35,    46,    19,    20,     7,     8,    36,
+      53,    27,     7,    35,    46,    19,    20,     4,     8,    36,
        9,    21,    40,    41,    42,    55,    12,    43,    18,    59,
-      21,    50,    51,    52,    49,    54,    58,    62,    56,    57,
-       0,     0,     0,    61,    60,     0,     0,    65,    64,     0,
+      21,    50,    51,    52,    49,     0,    54,    58,    56,    57,
+      62,     0,     0,    61,    60,     0,     0,    65,    64,     0,
        0,    63,    67,     0,     0,    66,     0,     0,    68,    29,
-      30,    31,    32,     0,     0,    37,     0,    33,    29,    30,
-      31,    32,     0,     0,     0,     0,    33
+      30,    31,    32,     0,     0,    37,    33,    29,    30,    31,
+      32,     0,     0,     0,    33
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,    17,    16,     0,     9,    35,    22,    10,    25,    12,
+       3,    17,    17,    16,     9,    35,    21,    10,    25,    12,
       15,    14,    42,    18,     7,     8,     9,    22,    23,    36,
-      50,    24,    17,    28,    41,     3,     4,     3,    16,    34,
-       5,     9,    37,    38,    39,    52,    21,    40,    22,    56,
-       9,    46,    47,    48,    43,    18,    18,    18,    53,    54,
-      -1,    -1,    -1,    58,    57,    -1,    -1,    62,    61,    -1,
+      50,    24,     3,    28,    41,     3,     4,     0,    16,    34,
+       5,     9,    37,    38,    39,    52,    20,    40,    21,    56,
+       9,    46,    47,    48,    43,    -1,    18,    18,    53,    54,
+      18,    -1,    -1,    58,    57,    -1,    -1,    62,    61,    -1,
       -1,    60,    65,    -1,    -1,    64,    -1,    -1,    67,    12,
-      13,    14,    15,    -1,    -1,    18,    -1,    20,    12,    13,
-      14,    15,    -1,    -1,    -1,    -1,    20
+      13,    14,    15,    -1,    -1,    18,    19,    12,    13,    14,
+      15,    -1,    -1,    -1,    19
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    16,    24,    30,     0,    17,    31,     3,    16,     5,
-      30,    31,    21,    31,    25,    31,    31,    30,    22,     3,
-       4,     9,    26,    27,    30,    30,    30,    31,    27,    12,
-      13,    14,    15,    20,    28,    30,    30,    18,    28,    27,
-      30,    30,    30,    31,     7,     8,    27,    29,    28,    25,
-      30,    30,    30,    28,    18,    27,    30,    30,    18,    27,
-      31,    30,    18,    25,    31,    30,    25,    31,    25
+       0,    16,    23,    29,     0,    17,    30,     3,    16,     5,
+      29,    30,    20,    30,    24,    30,    30,    29,    21,     3,
+       4,     9,    25,    26,    29,    29,    29,    30,    26,    12,
+      13,    14,    15,    19,    27,    29,    29,    18,    27,    26,
+      29,    29,    29,    30,     7,     8,    26,    28,    27,    24,
+      29,    29,    29,    27,    18,    26,    29,    29,    18,    26,
+      30,    29,    18,    24,    30,    29,    24,    30,    24
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    23,    24,    25,    25,    25,    25,    25,    26,    26,
-      26,    27,    27,    28,    28,    28,    28,    28,    28,    29,
-      29,    29,    30,    30,    31,    31
+       0,    22,    23,    24,    24,    24,    24,    24,    25,    25,
+      25,    26,    26,    27,    27,    27,    27,    27,    27,    28,
+      28,    28,    29,    29,    30,    30
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1206,80 +1221,74 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* debut: Space Retour TINT TSPACE TMAIN Space Retour TAcoDeb Retour Programme Retour TAcoEnd Space Retour  */
-#line 34 "grammaire.y"
-       { printf("[MAIN]\n"); }
-#line 1213 "y.tab.c"
-    break;
-
   case 3: /* Programme: Retour Space Entree Space Var Space Ope Space Data Space TENDOP Space Retour Programme  */
-#line 44 "grammaire.y"
-        { printf("[Entree][Var][Ope][Data] : %d \n", yyvsp[-4]); }
-#line 1219 "y.tab.c"
-    break;
-
-  case 4: /* Programme: Retour Space Entree Space Var Space TENDOP Space Retour Programme  */
-#line 47 "grammaire.y"
-         { printf("[Entree][Var];\n"); }
-#line 1225 "y.tab.c"
-    break;
-
-  case 5: /* Programme: Retour Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme  */
-#line 50 "grammaire.y"
-        { printf("[Var][Ope][Var][Ope][Var];\n");}
-#line 1231 "y.tab.c"
-    break;
-
-  case 6: /* Programme: Retour Space Entree Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme  */
-#line 53 "grammaire.y"
-        { printf("[Entree][Var][Ope][Var][Ope][Var]\n");}
-#line 1237 "y.tab.c"
+#line 56 "grammaire.y"
+        { dico.var = (yyvsp[-11].v3) ; printf("%s %s %s %f\n" , dico.var, (yyvsp[-9].v3), (yyvsp[-7].v3), (yyvsp[-5].v2));}
+#line 1228 "y.tab.c"
     break;
 
   case 8: /* Entree: TINT  */
-#line 58 "grammaire.y"
-              { printf("Entree"); }
-#line 1243 "y.tab.c"
+#line 64 "grammaire.y"
+              {(yyval.v3) = (yyvsp[0].v3);}
+#line 1234 "y.tab.c"
+    break;
+
+  case 9: /* Entree: TFLOAT  */
+#line 65 "grammaire.y"
+               {(yyval.v3) = (yyvsp[0].v3);}
+#line 1240 "y.tab.c"
     break;
 
   case 11: /* Var: TVAR  */
-#line 62 "grammaire.y"
-           { printf("Var\n"); }
-#line 1249 "y.tab.c"
+#line 68 "grammaire.y"
+           {(yyval.v3) = (yyvsp[0].v3);}
+#line 1246 "y.tab.c"
     break;
 
   case 13: /* Ope: TEQ  */
-#line 65 "grammaire.y"
-          { printf("Ope\n"); }
-#line 1255 "y.tab.c"
+#line 71 "grammaire.y"
+          {(yyval.v3) = (yyvsp[0].v3);}
+#line 1252 "y.tab.c"
+    break;
+
+  case 14: /* Ope: TDIV  */
+#line 72 "grammaire.y"
+             {(yyval.v3) = (yyvsp[0].v3);}
+#line 1258 "y.tab.c"
+    break;
+
+  case 15: /* Ope: TMUL  */
+#line 73 "grammaire.y"
+             {(yyval.v3) = (yyvsp[0].v3);}
+#line 1264 "y.tab.c"
+    break;
+
+  case 16: /* Ope: TMINUS  */
+#line 74 "grammaire.y"
+               {(yyval.v3) = (yyvsp[0].v3);}
+#line 1270 "y.tab.c"
+    break;
+
+  case 17: /* Ope: TPLUS  */
+#line 75 "grammaire.y"
+              {(yyval.v3) = (yyvsp[0].v3);}
+#line 1276 "y.tab.c"
     break;
 
   case 19: /* Data: TNBR  */
-#line 72 "grammaire.y"
-            { yyval=yyvsp[0]; }
-#line 1261 "y.tab.c"
+#line 78 "grammaire.y"
+            { (yyval.v2) = (yyvsp[0].v1); }
+#line 1282 "y.tab.c"
     break;
 
   case 20: /* Data: TFLOATNBR  */
-#line 73 "grammaire.y"
-                  { yyval=yyvsp[0];}
-#line 1267 "y.tab.c"
-    break;
-
-  case 22: /* Space: TSPACE  */
-#line 77 "grammaire.y"
-               { printf("Space\n"); }
-#line 1273 "y.tab.c"
-    break;
-
-  case 24: /* Retour: TRET  */
-#line 80 "grammaire.y"
-              { printf("Ret\n"); }
-#line 1279 "y.tab.c"
+#line 79 "grammaire.y"
+                  { (yyval.v2) = (yyvsp[0].v2);}
+#line 1288 "y.tab.c"
     break;
 
 
-#line 1283 "y.tab.c"
+#line 1292 "y.tab.c"
 
       default: break;
     }
@@ -1473,7 +1482,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 84 "grammaire.y"
+#line 90 "grammaire.y"
 
 
 int yyerror(char * s) {

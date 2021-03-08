@@ -70,10 +70,9 @@ extern int yydebug;
     TSPACE = 271,                  /* TSPACE  */
     TRET = 272,                    /* TRET  */
     TENDOP = 273,                  /* TENDOP  */
-    TVIR = 274,                    /* TVIR  */
-    TEQ = 275,                     /* TEQ  */
-    TAcoDeb = 276,                 /* TAcoDeb  */
-    TAcoEnd = 277                  /* TAcoEnd  */
+    TEQ = 274,                     /* TEQ  */
+    TAcoDeb = 275,                 /* TAcoDeb  */
+    TAcoEnd = 276                  /* TAcoEnd  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -98,14 +97,21 @@ extern int yydebug;
 #define TSPACE 271
 #define TRET 272
 #define TENDOP 273
-#define TVIR 274
-#define TEQ 275
-#define TAcoDeb 276
-#define TAcoEnd 277
+#define TEQ 274
+#define TAcoDeb 275
+#define TAcoEnd 276
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 16 "grammaire.y"
+int v1; double v2; char * v3;
+
+#line 112 "y.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

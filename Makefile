@@ -1,5 +1,4 @@
 default:
-	flex regle2.lex
 	yacc -d grammaire.y
 	yacc grammaire.y
 	flex regle2.lex

@@ -1,28 +1,41 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+
+typedef struct Dico Dico;
+struct Dico {
+  char * var;              
+  double h1;
+  int h2;
+};
+
+Dico dico;
+
 %}
 
-%token TINT
-%token TFLOAT
+%union {int v1; double v2; char * v3;} 
+%token <v3> TINT
+%token <v3> TFLOAT
 %token TMAIN
 %token TPRINTF
-%token TFLOATNBR
-%token TNBR
-%token TVAR
+%token <v2>TFLOATNBR
+%token <v1> TNBR
+%token <v3> TVAR
 %token TPO
 %token TPF
-%token TMUL
-%token TDIV
-%token TMINUS
-%token TPLUS
+%token <v3>TMUL
+%token <v3>TDIV
+%token <v3>TMINUS
+%token <v3>TPLUS
 %token TSPACE
 %token TRET
 %token TENDOP
-%token TVIR
-%token TEQ
+%token <v3>TEQ
 %token TAcoDeb
 %token TAcoEnd
+
+%type <v2> Data 
+%type <v3> Entree Var Ope
 
 %%
 
@@ -30,9 +43,7 @@
 [PROGRAMME]
 }
 */
-debut : Space Retour TINT TSPACE TMAIN Space Retour TAcoDeb Retour Programme Retour TAcoEnd Space Retour
-       { printf("[MAIN]\n"); }
-       ;
+debut : Space Retour TINT TSPACE TMAIN Space Retour TAcoDeb Retour Programme Retour TAcoEnd Space Retour;
 
 /*
 [Entree][Var][Ope][Data];
@@ -41,43 +52,38 @@ debut : Space Retour TINT TSPACE TMAIN Space Retour TAcoDeb Retour Programme Ret
 [Entree][Var][Ope][Var][Ope][Var]
 */
 Programme : Retour Space Entree Space Var Space Ope Space Data Space TENDOP Space Retour Programme
-        { printf("[Entree][Var][Ope][Data] : %d \n", $8); }
+
+        { dico.var = $3 ; printf("%s %s %s %f\n" , dico.var, $5, $7, $9);}
 
         | Retour Space Entree Space Var Space TENDOP Space Retour Programme
-         { printf("[Entree][Var];\n"); }
-
         | Retour Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme
-        { printf("[Var][Ope][Var][Ope][Var];\n");}
-
         | Retour Space Entree Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme
-        { printf("[Entree][Var][Ope][Var][Ope][Var]\n");}
-
         | 
         ;
 
-Entree : TINT { printf("Entree"); }  
-      | TFLOAT
+Entree : TINT {$$ = $1;}
+      | TFLOAT {$$ = $1;}
       |
       ;
-Var : TVAR { printf("Var\n"); }  
+Var : TVAR {$$ = $1;}
       |
       ;
-Ope : TEQ { printf("Ope\n"); }  
-      | TDIV
-      | TMUL
-      | TMINUS
-      | TPLUS
+Ope : TEQ {$$ = $1;}
+      | TDIV {$$ = $1;}
+      | TMUL {$$ = $1;}
+      | TMINUS {$$ = $1;}
+      | TPLUS {$$ = $1;}
       | 
       ;
-Data : TNBR { $$=$1; }  
-      | TFLOATNBR { $$=$1;}
+Data : TNBR { $$ = $1; }
+      | TFLOATNBR { $$ = $1;}
       | 
       ;
 
-Space : TSPACE { printf("Space\n"); }  
+Space : TSPACE
       | 
       ;
-Retour : TRET { printf("Ret\n"); }  
+Retour : TRET
       | 
       ;
 
