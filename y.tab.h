@@ -64,15 +64,20 @@ extern int yydebug;
     TPO = 265,                     /* TPO  */
     TPF = 266,                     /* TPF  */
     TMUL = 267,                    /* TMUL  */
-    TDIV = 268,                    /* TDIV  */
-    TMINUS = 269,                  /* TMINUS  */
-    TPLUS = 270,                   /* TPLUS  */
-    TSPACE = 271,                  /* TSPACE  */
-    TRET = 272,                    /* TRET  */
-    TENDOP = 273,                  /* TENDOP  */
-    TEQ = 274,                     /* TEQ  */
-    TAcoDeb = 275,                 /* TAcoDeb  */
-    TAcoEnd = 276                  /* TAcoEnd  */
+    TIF = 268,                     /* TIF  */
+    TELSE = 269,                   /* TELSE  */
+    TELSEIF = 270,                 /* TELSEIF  */
+    TDIV = 271,                    /* TDIV  */
+    TMINUS = 272,                  /* TMINUS  */
+    TPLUS = 273,                   /* TPLUS  */
+    TSPACE = 274,                  /* TSPACE  */
+    TRET = 275,                    /* TRET  */
+    TENDOP = 276,                  /* TENDOP  */
+    TEQ = 277,                     /* TEQ  */
+    TAcoDeb = 278,                 /* TAcoDeb  */
+    TAcoEnd = 279,                 /* TAcoEnd  */
+    TADD = 280,                    /* TADD  */
+    TSUB = 281                     /* TSUB  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -91,24 +96,29 @@ extern int yydebug;
 #define TPO 265
 #define TPF 266
 #define TMUL 267
-#define TDIV 268
-#define TMINUS 269
-#define TPLUS 270
-#define TSPACE 271
-#define TRET 272
-#define TENDOP 273
-#define TEQ 274
-#define TAcoDeb 275
-#define TAcoEnd 276
+#define TIF 268
+#define TELSE 269
+#define TELSEIF 270
+#define TDIV 271
+#define TMINUS 272
+#define TPLUS 273
+#define TSPACE 274
+#define TRET 275
+#define TENDOP 276
+#define TEQ 277
+#define TAcoDeb 278
+#define TAcoEnd 279
+#define TADD 280
+#define TSUB 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "grammaire.y"
+#line 7 "grammaire.y"
 int v1; double v2; char * v3;
 
-#line 112 "y.tab.h"
+#line 122 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

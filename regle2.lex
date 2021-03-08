@@ -8,9 +8,12 @@
 int { yylval.v3 = strdup(yytext); return(TINT); }
 double { yylval.v3 = strdup(yytext) ; return(TFLOAT); }
 main\(\) { return(TMAIN); }
-printf\(.*\) { return(TPRINTF); }
+printf\(.*\) {yylval.v3 = strdup(yytext) ;return(TPRINTF); }
 ([0-9])+[.]([0-9])+ {yylval.v2=atof(yytext); return(TFLOATNBR); }
 [0-9]+ {  yylval.v1=atoi(yytext); return(TNBR); }
+if\(.*\) {yylval.v3 = strdup(yytext);return(TIF);}
+else\(.*\) {yylval.v3 = strdup(yytext);return(TELSE);}
+"else if"\(.*\) {yylval.v3 = strdup(yytext);return(TELSEIF);}
 [a-zA-Z1-9\_]+ { yylval.v3 = strdup(yytext);return(TVAR); }
 [\(] { return(TPO);}
 [\)] { return(TPF);}
