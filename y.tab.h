@@ -66,18 +66,25 @@ extern int yydebug;
     TMUL = 267,                    /* TMUL  */
     TIF = 268,                     /* TIF  */
     TELSE = 269,                   /* TELSE  */
-    TELSEIF = 270,                 /* TELSEIF  */
-    TDIV = 271,                    /* TDIV  */
-    TMINUS = 272,                  /* TMINUS  */
-    TPLUS = 273,                   /* TPLUS  */
-    TSPACE = 274,                  /* TSPACE  */
-    TRET = 275,                    /* TRET  */
-    TENDOP = 276,                  /* TENDOP  */
-    TEQ = 277,                     /* TEQ  */
-    TAcoDeb = 278,                 /* TAcoDeb  */
-    TAcoEnd = 279,                 /* TAcoEnd  */
-    TADD = 280,                    /* TADD  */
-    TSUB = 281                     /* TSUB  */
+    TDIV = 270,                    /* TDIV  */
+    TMINUS = 271,                  /* TMINUS  */
+    TPLUS = 272,                   /* TPLUS  */
+    TENDOP = 273,                  /* TENDOP  */
+    TEQ = 274,                     /* TEQ  */
+    TAcoDeb = 275,                 /* TAcoDeb  */
+    TRETURN = 276,                 /* TRETURN  */
+    TAcoEnd = 277,                 /* TAcoEnd  */
+    TCOMA = 278,                   /* TCOMA  */
+    TLogicalAnd = 279,             /* TLogicalAnd  */
+    TLogicalOr = 280,              /* TLogicalOr  */
+    TLogicalInf = 281,             /* TLogicalInf  */
+    TLogicalSup = 282,             /* TLogicalSup  */
+    TLogicalSupEq = 283,           /* TLogicalSupEq  */
+    TLogicalInfEq = 284,           /* TLogicalInfEq  */
+    TLogicalEq = 285,              /* TLogicalEq  */
+    TLogicalNorEq = 286,           /* TLogicalNorEq  */
+    TADD = 287,                    /* TADD  */
+    TSUB = 288                     /* TSUB  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -98,18 +105,25 @@ extern int yydebug;
 #define TMUL 267
 #define TIF 268
 #define TELSE 269
-#define TELSEIF 270
-#define TDIV 271
-#define TMINUS 272
-#define TPLUS 273
-#define TSPACE 274
-#define TRET 275
-#define TENDOP 276
-#define TEQ 277
-#define TAcoDeb 278
-#define TAcoEnd 279
-#define TADD 280
-#define TSUB 281
+#define TDIV 270
+#define TMINUS 271
+#define TPLUS 272
+#define TENDOP 273
+#define TEQ 274
+#define TAcoDeb 275
+#define TRETURN 276
+#define TAcoEnd 277
+#define TCOMA 278
+#define TLogicalAnd 279
+#define TLogicalOr 280
+#define TLogicalInf 281
+#define TLogicalSup 282
+#define TLogicalSupEq 283
+#define TLogicalInfEq 284
+#define TLogicalEq 285
+#define TLogicalNorEq 286
+#define TADD 287
+#define TSUB 288
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -118,7 +132,7 @@ union YYSTYPE
 #line 7 "grammaire.y"
 int v1; double v2; char * v3;
 
-#line 122 "y.tab.h"
+#line 136 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

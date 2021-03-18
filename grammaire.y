@@ -15,91 +15,109 @@
 %token TPO
 %token TPF
 %token <v3>TMUL
-%token <v3>TIF
-%token <v3>TELSE
-%token <v3>TELSEIF
+%token TIF
+%token TELSE
 %token <v3>TDIV
 %token <v3>TMINUS
 %token <v3>TPLUS
-%token TSPACE
-%token TRET
 %token TENDOP
 %token <v3>TEQ
 %token TAcoDeb
+%token TRETURN
 %token TAcoEnd
+%token TCOMA
+%token TLogicalAnd
+%token TLogicalOr
+%token TLogicalInf
+%token TLogicalSup
+%token TLogicalSupEq
+%token TLogicalInfEq
+%token TLogicalEq
+%token TLogicalNorEq
 
 %left TADD TSUB
 %left TMUL TDIV
 %right TEQ
 
-%type <v2> Data 
-%type <v3> Entree Var Ope Printf
+%type <v1> Data_int
+%type <v2> Data_float
+%type <v3> Entree Ope
 
 %%
 
-debut : Space Retour TINT TSPACE TMAIN Space Retour TAcoDeb Retour Programme Retour TAcoEnd Space Retour { printf("[MAIN]");};
+debut : TINT TMAIN TAcoDeb Programme TAcoEnd { printf("[MAIN]");};
 
-/*
-[Statement]
-[Printf]
-[Expression]
 
-*/
-Programme : Statement {printf("[statement]\n") ; }
-        | Expression {printf("[Expression]\n") ; }
-        | Printf {printf("[printf]") ; }
+Programme : Instructions {printf("[Instruction]\n") ; }
         | 
         ;
 
-Expression : Retour Space Entree Space Var Space Ope Space Data Space TENDOP Space Retour Programme
-        { printf("%s %s %s %f\n" , $3, $5, $7, $9);}
-        | Retour Space Entree Space Var Space TENDOP Space Retour Programme
-        { printf("%s %s\n" , $3, $5);}
-        | Retour Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme
-         {printf("%s %s %s %s %s\n" , $3, $5, $7, $9, $11);}
-        | Retour Space Entree Space Var Space Ope Space Var Space Ope Space Var TENDOP Space Retour Programme
-         {printf("%s %s %s %s $s $s\n" , $3, $5, $7, $9, $11, $13);}
-        | 
-        ;
 
-Statement : Retour Space TIF Body Retour Space Programme{ printf("%s" , $3); }
-            | Retour Space TELSE Body Retour Space Programme{ printf("%s" , $3); }
-            | Retour Space TELSEIF Body Retour Space Programme{ printf("%s" , $3); }
-            | 
-            ;
+Instructions : Instruction Instructions | ;
 
-Body : Retour Space TAcoDeb Retour Space Expression Space Retour TAcoEnd Space Retour Programme{printf("[BODY]\n") ; } 
-      | 
-      ;
-Printf : Retour Space TPRINTF TENDOP Space Retour Programme {printf("%s\n", $3);} 
-      | 
-      ;
+Instruction : Declaration TENDOP { printf("Declaration\n");}
+            | Affectation TENDOP  { printf("Affectation\n");}
+            | Call_Function TENDOP  { printf("Call_Function\n");}
+            | TRETURN Expression TENDOP { printf("Return\n");} ; 
+            | TPRINTF TENDOP {printf("printf\n") ; }
+            | Statement {printf("[statement]\n") ; };
+ 
 
-Entree : TINT {printf("[entree]\n"); $$ = $1;}
-      | TFLOAT {$$ = $1;}
-      |
-      ;
-Var : TVAR {$$ = $1; printf("[tvar]\n"); $$ = $1;}
-      |
-      ;
-Ope : TEQ {$$ = $1;}
-      | TDIV {$$ = $1;}
-      | TMUL {$$ = $1;}
-      | TMINUS {$$ = $1;}
-      | TPLUS {$$ = $1;}
-      | 
-      ;
-Data : TNBR { $$ = $1; }
-      | TFLOATNBR { $$ = $1;}
-      | 
-      ;
+Declaration : Entree TVAR Declaration_Suite
+            | Entree Affectation Declaration_Suite ;
 
-Space : TSPACE {printf("[SPACE]\n") ; }
-      | 
-      ;
-Retour : TRET {printf("[RET]\n") ; }
-      | 
-      ;
+Declaration_Suite : TCOMA TVAR Declaration_Suite
+            | TCOMA Affectation Declaration_Suite
+            | ;
+
+Affectation: TVAR TEQ Expression;
+
+Call_Function : TVAR TPO Params TPF TENDOP;
+
+Params : Param SuiteParam | ;
+
+Param : Entree TVAR;
+
+SuiteParam : TCOMA Param SuiteParam | ;
+
+Expression : Expression Ope Expression 
+            | TPO Expression TPF
+            | Data;
+
+Data : TVAR
+      | Data_int
+      | Data_float;
+
+
+Statement : TIF Condition Corp SuiteIF ;
+Condition : Condition LogicalOperator Condition
+            | TPO Condition TPF 
+            | Data;
+
+SuiteIF : TELSE TIF Condition Corp SuiteIF | TELSE Corp | ;
+
+Corp : TAcoDeb Instructions TAcoEnd { printf("Corp\n"); };
+
+LogicalOperator : TLogicalAnd
+            | TLogicalEq
+            | TLogicalInfEq
+            | TLogicalNorEq
+            | TLogicalOr
+            | TLogicalSup
+            | TLogicalSupEq
+            | TLogicalInf;
+
+Entree : TINT 
+      | TFLOAT ;
+
+Ope :  TDIV 
+      | TMUL 
+      | TMINUS 
+      | TPLUS 
+
+Data_int : TNBR;
+Data_float : TFLOATNBR ;
+
 
 %%
 
