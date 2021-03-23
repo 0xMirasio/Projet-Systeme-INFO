@@ -25,10 +25,10 @@ Symbol * createSymbol(int type, char * name, unsigned int addr, int depth);
 Symbol_table * createHead(void);
 void insertSymbol(Symbol_table * table_head, Symbol * s);
 Symbol * getSymbol(Symbol_table * table_head, char * name);
-
+void removeSymbol(Symbol_table * table_head, char * name);
 void setInitialized(Symbol * s);
 int isInitialised(Symbol * s);
 unsigned int getAddress(Symbol * s);
-
-
+int getType(Symbol_table * table_head, char * name);
+int getDepth(Symbol_table * table_head, char * name);
 void print_table(Symbol_table * table);

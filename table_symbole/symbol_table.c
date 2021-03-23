@@ -48,6 +48,22 @@ void insertSymbol(Symbol_table * table_head, Symbol * s){
     }
 }
 
+void removeSymbol(Symbol_table * table_head, char * name) {
+    
+    Symbol_table * current;
+    
+    current = table_head;
+    while(current != NULL){
+        if(strcmp(current->data->name, name) == 0){
+            current->data->isInitialized = 0;
+            current->data->depth = 0;
+            current->data->type = 0;
+            current->data->name = "FREE";
+        }
+        current = current->next;
+    }
+}
+
 Symbol * getSymbol(Symbol_table * table_head, char * name){
    
     Symbol_table * current;
@@ -76,6 +92,41 @@ unsigned int getAddress(Symbol * s){
     return s->addr;
 }
 
+/*
+
+type 1 : int
+type 2 : char
+type 3 : double
+
+si 0 est renvoyé => problème recherche symbol dans table_head, gerer l'erreur
+*/
+int getType(Symbol_table * table_head, char * name) {
+    Symbol_table * current;
+    
+    current = table_head;
+    while(current != NULL){
+        if(strcmp(current->data->name, name) == 0){
+            return current->data->type;
+        }
+        current = current->next;
+    }
+
+    return 0;
+}
+
+int getDepth(Symbol_table * table_head, char * name) {
+    Symbol_table * current;
+    
+    current = table_head;
+    while(current != NULL){
+        if(strcmp(current->data->name, name) == 0){
+            return current->data->depth;
+        }
+        current = current->next;
+    }
+
+    return 0;
+}
 
 void print_table(Symbol_table * table_head){
     Symbol_table * current;

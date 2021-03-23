@@ -1,9 +1,20 @@
+GFN = grammaire.y
+RFN = regle.lex
+GF = out
+
 default: 
-	yacc -d grammaire.y
-	yacc grammaire.y
-	flex regle2.lex
-	gcc  y.tab.c lex.yy.c -o out
-	./out < example.c
+	yacc -d $(GFN)
+	yacc $(GFN)
+	flex $(RFN)
+	gcc y.tab.c lex.yy.c -o $(GF)
+	./$(GF) < example.c
 
 clean:
-	rm lex.yy.c y.tab.*
+	rm lex.yy.c y.* $(GF)
+
+example:
+	yacc -d $(GFN)
+	yacc $(GFN)
+	flex $(RFN)
+	gcc y.tab.c lex.yy.c -o $(GF)
+	./$(GF) < example2.c

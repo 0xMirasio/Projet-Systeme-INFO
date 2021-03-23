@@ -54,37 +54,36 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    TINT = 258,                    /* TINT  */
-    TFLOAT = 259,                  /* TFLOAT  */
-    TMAIN = 260,                   /* TMAIN  */
-    TPRINTF = 261,                 /* TPRINTF  */
-    TFLOATNBR = 262,               /* TFLOATNBR  */
-    TNBR = 263,                    /* TNBR  */
-    TVAR = 264,                    /* TVAR  */
-    TPO = 265,                     /* TPO  */
-    TPF = 266,                     /* TPF  */
-    TMUL = 267,                    /* TMUL  */
-    TIF = 268,                     /* TIF  */
-    TELSE = 269,                   /* TELSE  */
-    TDIV = 270,                    /* TDIV  */
-    TMINUS = 271,                  /* TMINUS  */
-    TPLUS = 272,                   /* TPLUS  */
-    TENDOP = 273,                  /* TENDOP  */
-    TEQ = 274,                     /* TEQ  */
-    TAcoDeb = 275,                 /* TAcoDeb  */
-    TRETURN = 276,                 /* TRETURN  */
-    TAcoEnd = 277,                 /* TAcoEnd  */
-    TCOMA = 278,                   /* TCOMA  */
-    TLogicalAnd = 279,             /* TLogicalAnd  */
-    TLogicalOr = 280,              /* TLogicalOr  */
-    TLogicalInf = 281,             /* TLogicalInf  */
-    TLogicalSup = 282,             /* TLogicalSup  */
-    TLogicalSupEq = 283,           /* TLogicalSupEq  */
-    TLogicalInfEq = 284,           /* TLogicalInfEq  */
-    TLogicalEq = 285,              /* TLogicalEq  */
-    TLogicalNorEq = 286,           /* TLogicalNorEq  */
-    TADD = 287,                    /* TADD  */
-    TSUB = 288                     /* TSUB  */
+    T_OPEN_BRAC = 258,             /* T_OPEN_BRAC  */
+    T_CLOSE_BRAC = 259,            /* T_CLOSE_BRAC  */
+    T_CONST_TYPE = 260,            /* T_CONST_TYPE  */
+    T_INT_TYPE = 261,              /* T_INT_TYPE  */
+    T_FLOAT_TYPE = 262,            /* T_FLOAT_TYPE  */
+    T_DOUBLE_TYPE = 263,           /* T_DOUBLE_TYPE  */
+    T_INT = 264,                   /* T_INT  */
+    T_FLOAT = 265,                 /* T_FLOAT  */
+    T_RETURN = 266,                /* T_RETURN  */
+    T_ADD = 267,                   /* T_ADD  */
+    T_SUB = 268,                   /* T_SUB  */
+    T_MUL = 269,                   /* T_MUL  */
+    T_DIV = 270,                   /* T_DIV  */
+    T_EQUALS = 271,                /* T_EQUALS  */
+    T_OPEN_PAR = 272,              /* T_OPEN_PAR  */
+    T_CLOSE_PAR = 273,             /* T_CLOSE_PAR  */
+    T_LOGICAL_SUP = 274,           /* T_LOGICAL_SUP  */
+    T_LOGICAL_INF = 275,           /* T_LOGICAL_INF  */
+    T_LOGICAL_AND = 276,           /* T_LOGICAL_AND  */
+    T_LOGICAL_OR = 277,            /* T_LOGICAL_OR  */
+    T_LOGICAL_SUP_EQ = 278,        /* T_LOGICAL_SUP_EQ  */
+    T_LOGICAL_INF_EQ = 279,        /* T_LOGICAL_INF_EQ  */
+    T_LOGICAL_EQ = 280,            /* T_LOGICAL_EQ  */
+    T_LOGICAL_NEQ = 281,           /* T_LOGICAL_NEQ  */
+    T_IF = 282,                    /* T_IF  */
+    T_ELSE = 283,                  /* T_ELSE  */
+    T_COMA = 284,                  /* T_COMA  */
+    T_END_INSTRUCT = 285,          /* T_END_INSTRUCT  */
+    T_PRINTF = 286,                /* T_PRINTF  */
+    T_VARNAME = 287                /* T_VARNAME  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -93,49 +92,40 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define TINT 258
-#define TFLOAT 259
-#define TMAIN 260
-#define TPRINTF 261
-#define TFLOATNBR 262
-#define TNBR 263
-#define TVAR 264
-#define TPO 265
-#define TPF 266
-#define TMUL 267
-#define TIF 268
-#define TELSE 269
-#define TDIV 270
-#define TMINUS 271
-#define TPLUS 272
-#define TENDOP 273
-#define TEQ 274
-#define TAcoDeb 275
-#define TRETURN 276
-#define TAcoEnd 277
-#define TCOMA 278
-#define TLogicalAnd 279
-#define TLogicalOr 280
-#define TLogicalInf 281
-#define TLogicalSup 282
-#define TLogicalSupEq 283
-#define TLogicalInfEq 284
-#define TLogicalEq 285
-#define TLogicalNorEq 286
-#define TADD 287
-#define TSUB 288
+#define T_OPEN_BRAC 258
+#define T_CLOSE_BRAC 259
+#define T_CONST_TYPE 260
+#define T_INT_TYPE 261
+#define T_FLOAT_TYPE 262
+#define T_DOUBLE_TYPE 263
+#define T_INT 264
+#define T_FLOAT 265
+#define T_RETURN 266
+#define T_ADD 267
+#define T_SUB 268
+#define T_MUL 269
+#define T_DIV 270
+#define T_EQUALS 271
+#define T_OPEN_PAR 272
+#define T_CLOSE_PAR 273
+#define T_LOGICAL_SUP 274
+#define T_LOGICAL_INF 275
+#define T_LOGICAL_AND 276
+#define T_LOGICAL_OR 277
+#define T_LOGICAL_SUP_EQ 278
+#define T_LOGICAL_INF_EQ 279
+#define T_LOGICAL_EQ 280
+#define T_LOGICAL_NEQ 281
+#define T_IF 282
+#define T_ELSE 283
+#define T_COMA 284
+#define T_END_INSTRUCT 285
+#define T_PRINTF 286
+#define T_VARNAME 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
-#line 7 "grammaire.y"
-int v1; double v2; char * v3;
-
-#line 136 "y.tab.h"
-
-};
-typedef union YYSTYPE YYSTYPE;
+typedef int YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

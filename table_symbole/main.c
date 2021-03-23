@@ -16,7 +16,8 @@ int main()
     setInitialized(x); 
     print_table(head_table);
     printf("addr = %d\n", s->addr);
-    printf("Hello World");
 
+    removeSymbol(head_table, "x");
+    print_table(head_table);
     return 0;
 }

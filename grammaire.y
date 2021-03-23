@@ -4,128 +4,160 @@
 
 %}
 
-%union {int v1; double v2; char * v3;} 
-%token <v3> TINT
-%token <v3> TFLOAT
-%token TMAIN
-%token <v3> TPRINTF
-%token <v2>TFLOATNBR
-%token <v1> TNBR
-%token <v3> TVAR
-%token TPO
-%token TPF
-%token <v3>TMUL
-%token TIF
-%token TELSE
-%token <v3>TDIV
-%token <v3>TMINUS
-%token <v3>TPLUS
-%token TENDOP
-%token <v3>TEQ
-%token TAcoDeb
-%token TRETURN
-%token TAcoEnd
-%token TCOMA
-%token TLogicalAnd
-%token TLogicalOr
-%token TLogicalInf
-%token TLogicalSup
-%token TLogicalSupEq
-%token TLogicalInfEq
-%token TLogicalEq
-%token TLogicalNorEq
+%token T_OPEN_BRAC T_CLOSE_BRAC
+%token T_CONST_TYPE T_INT_TYPE T_FLOAT_TYPE T_DOUBLE_TYPE
+%token T_INT T_FLOAT 
+%token T_RETURN
 
-%left TADD TSUB
-%left TMUL TDIV
-%right TEQ
+%token T_ADD T_SUB T_MUL T_DIV T_EQUALS
 
-%type <v1> Data_int
-%type <v2> Data_float
-%type <v3> Entree Ope
+%token T_OPEN_PAR T_CLOSE_PAR
+
+%token T_LOGICAL_SUP T_LOGICAL_INF
+
+%token T_LOGICAL_AND T_LOGICAL_OR
+%token T_LOGICAL_SUP_EQ T_LOGICAL_INF_EQ
+%token T_LOGICAL_EQ T_LOGICAL_NEQ
+
+%token T_IF T_ELSE
+%token T_COMA
+
+%token T_END_INSTRUCT
+%token T_PRINTF
+%token T_VARNAME 
+
+
+%right T_EQUALS
+
+%left T_LOGICAL_OR
+%left T_LOGICAL_AND
+%left T_LOGICAL_EQ T_LOGICAL_NEQ
+%left T_LOGICAL_SUP_EQ T_LOGICAL_INF_EQ T_LOGICAL_SUP T_LOGICAL_INF
+%left T_ADD T_SUB
+%left T_MUL T_DIV
 
 %%
+DEBUT : FUNCTIONS ;
 
-debut : TINT TMAIN TAcoDeb Programme TAcoEnd { printf("[MAIN]");};
+FUNCTIONS :
+		DECLARE_FUNCTION FUNCTIONS
+		| ;
+
+CORPS : 
+    	T_OPEN_BRAC INSTRUCTIONS T_CLOSE_BRAC 
+
+INSTRUCTIONS : 
+		INSTRUCTION INSTRUCTIONS 
+		| ; 
+
+INSTRUCTION : 
+		DECLARATION T_END_INSTRUCT
+		| AFFECTATION T_END_INSTRUCT
+		| CALL_FUNCTION T_END_INSTRUCT
+		| IF 
+		| T_PRINTF T_END_INSTRUCT
+		| RETURN T_END_INSTRUCT; 
+
+RETURN :
+	T_RETURN EXPR;
+
+DECLARATION : 
+		VAR_TYPE T_VARNAME SUITE_DECLARATION 
+		| VAR_TYPE AFFECTATION SUITE_DECLARATION;
+
+SUITE_DECLARATION :
+		T_COMA T_VARNAME SUITE_DECLARATION
+		| T_COMA AFFECTATION SUITE_DECLARATION
+		| ;
+
+AFFECTATION : 
+		T_VARNAME T_EQUALS EXPR
+
+VAR_TYPE : 
+		T_FLOAT_TYPE
+		| T_DOUBLE_TYPE
+		| T_INT_TYPE ;
+
+/* Function declaration */
+DECLARE_FUNCTION : 
+		VAR_TYPE T_VARNAME T_OPEN_PAR DECLARE_PARAMETERS T_CLOSE_PAR CORPS;
+
+DECLARE_PARAMETERS : 
+		DECLARE_PARAMETER DECLARE_SUITEPARAM
+		| ;
+
+DECLARE_PARAMETER :
+		VAR_TYPE T_VARNAME ;
+
+DECLARE_SUITEPARAM :
+		T_COMA DECLARE_PARAMETER DECLARE_SUITEPARAM
+		| ;
 
 
-Programme : Instructions {printf("[Instruction]\n") ; }
-        | 
-        ;
+/* Function call */
+CALL_FUNCTION : 
+		T_VARNAME T_OPEN_PAR CALL_PARAMETERS T_CLOSE_PAR;
+
+CALL_PARAMETERS : 
+		CALL_PARAMETER CALL_SUITEPARAM
+		| ;
+
+CALL_PARAMETER : T_VARNAME;
+
+CALL_SUITEPARAM :
+		T_COMA CALL_PARAMETER CALL_SUITEPARAM
+		| ;
 
 
-Instructions : Instruction Instructions | ;
+/* Arithmetic expression*/
+EXPR : 
+		EXPR T_ADD EXPR
+		| EXPR T_SUB EXPR
+		| EXPR T_MUL EXPR
+		| EXPR T_DIV EXPR
+		| T_OPEN_PAR EXPR T_CLOSE_PAR
+    	| T_VARNAME
+		| CALL_FUNCTION
+    	| NUMBER ;
+    
 
-Instruction : Declaration TENDOP { printf("Declaration\n");}
-            | Affectation TENDOP  { printf("Affectation\n");}
-            | Call_Function TENDOP  { printf("Call_Function\n");}
-            | TRETURN Expression TENDOP { printf("Return\n");} ; 
-            | TPRINTF TENDOP {printf("printf\n") ; }
-            | Statement {printf("[statement]\n") ; };
- 
-
-Declaration : Entree TVAR Declaration_Suite
-            | Entree Affectation Declaration_Suite ;
-
-Declaration_Suite : TCOMA TVAR Declaration_Suite
-            | TCOMA Affectation Declaration_Suite
-            | ;
-
-Affectation: TVAR TEQ Expression;
-
-Call_Function : TVAR TPO Params TPF TENDOP;
-
-Params : Param SuiteParam | ;
-
-Param : Entree TVAR;
-
-SuiteParam : TCOMA Param SuiteParam | ;
-
-Expression : Expression Ope Expression 
-            | TPO Expression TPF
-            | Data;
-
-Data : TVAR
-      | Data_int
-      | Data_float;
+NUMBER : 
+    	T_INT
+    	| T_FLOAT ;
 
 
-Statement : TIF Condition Corp SuiteIF ;
-Condition : Condition LogicalOperator Condition
-            | TPO Condition TPF 
-            | Data;
 
-SuiteIF : TELSE TIF Condition Corp SuiteIF | TELSE Corp | ;
+/* Logical condition */
+CONDITION :
+		CONDITION T_LOGICAL_AND CONDITION
+		| CONDITION T_LOGICAL_OR CONDITION
+		| CONDITION T_LOGICAL_EQ CONDITION
+		| CONDITION T_LOGICAL_NEQ CONDITION
+		| CONDITION T_LOGICAL_SUP_EQ CONDITION
+		| CONDITION T_LOGICAL_INF_EQ CONDITION
+		| CONDITION T_LOGICAL_SUP CONDITION
+		| CONDITION T_LOGICAL_INF CONDITION
+		| T_OPEN_PAR CONDITION T_CLOSE_PAR
+		| T_OPEN_PAR AFFECTATION T_CLOSE_PAR
+    	| T_VARNAME
+    	| NUMBER;
 
-Corp : TAcoDeb Instructions TAcoEnd { printf("Corp\n"); };
 
-LogicalOperator : TLogicalAnd
-            | TLogicalEq
-            | TLogicalInfEq
-            | TLogicalNorEq
-            | TLogicalOr
-            | TLogicalSup
-            | TLogicalSupEq
-            | TLogicalInf;
 
-Entree : TINT 
-      | TFLOAT ;
+/* If; Else If; Else */
+IF :
+    	T_IF CONDITION CORPS SUITE_IF ;
 
-Ope :  TDIV 
-      | TMUL 
-      | TMINUS 
-      | TPLUS 
-
-Data_int : TNBR;
-Data_float : TFLOATNBR ;
+SUITE_IF : 
+		T_ELSE T_IF CONDITION CORPS SUITE_IF
+		| T_ELSE CORPS
+		| ;
 
 
 %%
+int yyerror(void)
+{ fprintf(stderr, "erreur de syntaxe\n"); return 1;}
 
-int yyerror(char * s) {
-    printf("\n%s\n", s);
-}
-
-
-int main(void) {
-  yyparse();
+int main(void){
+    yyparse();
 }

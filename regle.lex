@@ -1,21 +1,46 @@
-%%
-int printf("tint, token= %s\n", yytext);
-char printf("tchar, token= %s\n", yytext);
-float printf("tfloat, token= %s\n", yytext);
-main\(\) printf("tmain, token= %s\n", yytext);
-printf\(.*\) printf("tprintf, token= %s\n", yytext);
-([0-9])+[,]([0-9])+ printf("tnbrfloat, token= %s\n", yytext);
-[0-9]+ printf("tnbr, token= %s\n", yytext);
-[a-zA-Z1-9\_]+ printf("tvar, token= %s\n", yytext);
-[\+\-\*\/\(\)] printf("tope, token= %s\n", yytext);
-"\t" printf("ttab, token= %s\n", yytext);
-" " printf("tespace, token= %s\n", yytext);
-"\n" printf("tret, token= %s\n", yytext);
-";" printf("tendI, token= %s\n", yytext);
-"," printf("tvir, token= %s\n", yytext);
-"=" printf("tequal, token= %s\n", yytext);
-"{" printf("tAcoOUV, token= %s\n", yytext);
-"}" printf("tAcoFERM, token= %s\n", yytext);
+%{
+#include "y.tab.h"
+
+%}
+
 %%
 
-int yywrap(){return 1;}
+\{ return T_OPEN_BRAC;
+\} return T_CLOSE_BRAC;
+const return T_CONST_TYPE;
+int return T_INT_TYPE;
+float return T_FLOAT_TYPE;
+double return T_DOUBLE_TYPE;
+[0-9]+ return T_INT;
+[0-9]+[\.][0-9]+ return T_FLOAT;
+return return T_RETURN;
+\+ return T_ADD;
+\- return T_SUB;
+\* return T_MUL;
+\/ return T_DIV;
+\= return T_EQUALS;
+\( return T_OPEN_PAR;
+\) return T_CLOSE_PAR;
+">" return T_LOGICAL_SUP;
+"<" return T_LOGICAL_INF;
+"&&" return T_LOGICAL_AND;
+"||" return T_LOGICAL_OR;
+">=" return T_LOGICAL_SUP_EQ;
+"<=" return T_LOGICAL_INF_EQ; 
+"==" return T_LOGICAL_EQ;
+"!=" return T_LOGICAL_NEQ;
+
+
+if return T_IF;
+else return T_ELSE;
+[\n\t\ ]+ {};
+, return T_COMA;
+; return T_END_INSTRUCT;
+printf\(.*\) return T_PRINTF;
+[A-z][A-z0-9_]* return T_VARNAME;
+
+%%
+int yywrap()
+{
+    return 1;
+}

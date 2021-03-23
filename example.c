@@ -8,8 +8,8 @@ int main(){
     if (a == 8 || a >= 5) {
         return 1;
     }
-    else if( a <5) {
-        return 3;
+    else if( a < 5) {
+        return 4;
     }
     else {
         return 3;
@@ -18,3 +18,4 @@ int main(){
     return res;
     
 }
+
