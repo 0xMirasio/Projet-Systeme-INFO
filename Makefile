@@ -1,20 +1,22 @@
+PG = main
+PGT = test
+
 GFN = grammaire.y
 RFN = regle.lex
-GF = out
 
-default: 
+default: compiler
+	./$(PG) < example.c
+
+test: compiler
+	gcc $(PGT).c symbol_table.o -o $(PGT)
+	./$(PGT)
+
+compiler:
+	gcc -c symbol_table.c 
 	yacc -d $(GFN)
 	yacc $(GFN)
 	flex $(RFN)
-	gcc y.tab.c lex.yy.c -o $(GF)
-	./$(GF) < example.c
+	gcc y.tab.c symbol_table.o lex.yy.c -o $(PG)
 
 clean:
-	rm lex.yy.c y.* $(GF)
-
-example:
-	yacc -d $(GFN)
-	yacc $(GFN)
-	flex $(RFN)
-	gcc y.tab.c lex.yy.c -o $(GF)
-	./$(GF) < example2.c
+	rm *.o $(PGT) y.tab.* $(PG) lex.yy.c
