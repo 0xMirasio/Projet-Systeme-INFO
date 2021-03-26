@@ -2,7 +2,7 @@
 
 Projet-Systeme-INFO est un projet dans le cadre de la formation ingénieur de l'INSA Toulouse. 
 
-Le dépôt continent :
+Le dépôt contient :
 
 -Des règles regle.lex qui analyse un fichier C pour retrouver les tokens
 
