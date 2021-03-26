@@ -3,28 +3,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symbol_table.h"
+#include "util.h"
+#include "opTable.h"
+#define MAX_MEMORY_SIZE 100
 
-char output_code[5000][20];
-u_int32_t line_pointer = 0;
 int global_depth = 0;
+int global_pointer_INT = 0;
+int global_pointer_DOUBLE = 0;
+Symbol_table * head_table; 
 
-void save_line(char* data){
-	strcpy(output_code[line_pointer], data);
-	line_pointer++; 
-}
 
-void print_output() {
-        printf("Output instructions:\n");
-        for(int i=0; i<line_pointer; i++) {
-			printf("\t%s\n", output_code[i]);
-		}
-}
 
 %}
 
+
+
+%union {int v1; double v2; char * v3;}
 %token T_OPEN_BRAC T_CLOSE_BRAC
-%token T_CONST_TYPE T_INT_TYPE T_FLOAT_TYPE T_DOUBLE_TYPE
-%token T_INT T_FLOAT 
+%token <v3> T_CONST_TYPE T_INT_TYPE T_FLOAT_TYPE T_DOUBLE_TYPE
+%token <v1> T_INT
+%token <v2> T_FLOAT 
 %token T_RETURN
 
 %token T_ADD T_SUB T_MUL T_DIV T_EQUALS
@@ -40,8 +38,9 @@ void print_output() {
 
 %token T_END_INSTRUCT
 %token T_PRINTF
-%token T_VARNAME 
+%token <v3> T_VARNAME 
 
+%type <v3> AFFECTATION VAR_TYPE
 
 %right T_EQUALS
 
@@ -53,17 +52,31 @@ void print_output() {
 %left T_MUL T_DIV
 
 %%
-DEBUT : FUNCTIONS {
-		save_line("MOV 0 R1\n");
-		print_output();
-} ;
+DEBUT : {
+		head_table = createHead();
+		int * memory_zone_INT = malloc(sizeof(int) * MAX_MEMORY_SIZE);
+		int * memory_zone_DOUBLE = malloc(sizeof(int) * MAX_MEMORY_SIZE); 
+
+		/*
+		int addr = 5;
+		*(memory_zone_INT+sizeof(int)*addr) = 5;
+		printf("%d", *(memory_zone_INT+sizeof(int)*addr));
+		*/
+
+		} FUNCTIONS
+		{
+			print_table(head_table);
+			save_line("MOV 0 R1\n");
+			print_output();
+		}
+		; 
 
 FUNCTIONS :
 		DECLARE_FUNCTION FUNCTIONS
 		| ;
 
 CORPS : 
-    	T_OPEN_BRAC { global_depth++; printf("New Depth : %d\n" , global_depth);} INSTRUCTIONS T_CLOSE_BRAC { global_depth--; printf("New Depth : %d\n" , global_depth);}
+    	T_OPEN_BRAC { global_depth++;} INSTRUCTIONS T_CLOSE_BRAC { global_depth--; }
 
 INSTRUCTIONS : 
 		INSTRUCTION INSTRUCTIONS 
@@ -81,22 +94,57 @@ RETURN :
 	T_RETURN EXPR;
 
 DECLARATION : 
-		VAR_TYPE T_VARNAME SUITE_DECLARATION
-		| VAR_TYPE AFFECTATION SUITE_DECLARATION
+		VAR_TYPE T_VARNAME SUITE_DECLARATION {
+
+			int type = getTypeByName($1);
+			if (type == 0) {
+				printf("ERROR : Type not found !!!\n");
+				exit(1);
+			}
+			Symbol * var;
+			if (type == 1) {
+				var = createSymbol(type, $2, global_pointer_INT, global_depth);
+				global_pointer_INT++;
+			}
+			if (type == 2) {
+				var = createSymbol(type, $2, global_pointer_DOUBLE, global_depth);
+				global_pointer_DOUBLE++;	
+			}
+			
+    		insertSymbol(head_table, var);
+
+			}
+		| VAR_TYPE AFFECTATION SUITE_DECLARATION {
+				int type = getTypeByName($1);
+				if (type == 0) {
+					printf("ERROR : Type not found !!!\n");
+					exit(1);
+				}
+				Symbol * var;
+				if (type == 1) {
+					var = createSymbol(type, $2, global_pointer_INT, global_depth);
+					global_pointer_INT++;
+				}
+				if (type == 2) {
+					var = createSymbol(type, $2, global_pointer_DOUBLE, global_depth);
+					global_pointer_DOUBLE++;	
+				}
+    			insertSymbol(head_table, var);
+			}
 		; 
 
 SUITE_DECLARATION :
-		T_COMA T_VARNAME SUITE_DECLARATION
-		| T_COMA AFFECTATION SUITE_DECLARATION
+		T_COMA T_VARNAME SUITE_DECLARATION 
+		| T_COMA AFFECTATION SUITE_DECLARATION 
 		| ;
 
 AFFECTATION : 
-		T_VARNAME T_EQUALS EXPR
+		T_VARNAME T_EQUALS EXPR {$$ = $1;}
 
 VAR_TYPE : 
-		T_FLOAT_TYPE
-		| T_DOUBLE_TYPE 
-		| T_INT_TYPE
+		T_FLOAT_TYPE {$$ = $1;}
+		| T_DOUBLE_TYPE  {$$ = $1;}
+		| T_INT_TYPE {$$ = $1;}
 		;
 
 /* Function declaration */
@@ -139,11 +187,12 @@ EXPR :
 		| T_OPEN_PAR EXPR T_CLOSE_PAR
     	| T_VARNAME
 		| CALL_FUNCTION
-    	| NUMBER ;
+    	| NUMBER {$$ = $1;}
+		;
     
 
-NUMBER : 
-    	T_INT
+NUMBER :  
+    	T_INT  
     	| T_FLOAT ;
 
 

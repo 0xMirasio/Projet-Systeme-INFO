@@ -7,11 +7,11 @@
 
 \{ return T_OPEN_BRAC;
 \} return T_CLOSE_BRAC;
-const return T_CONST_TYPE;
-int return T_INT_TYPE;
-float return T_FLOAT_TYPE;
-double return T_DOUBLE_TYPE;
-[0-9]+ return T_INT;
+const {yylval.v3 = strdup(yytext);return T_CONST_TYPE;}
+int {yylval.v3 = strdup(yytext);return T_INT_TYPE;}
+float {yylval.v3 = strdup(yytext);return T_FLOAT_TYPE;}
+double {yylval.v3 = strdup(yytext);return T_DOUBLE_TYPE;}
+[0-9]+  {yylval.v1 = atoi(yytext); return T_INT;}
 [0-9]+[\.][0-9]+ return T_FLOAT;
 return return T_RETURN;
 \+ return T_ADD;
@@ -37,7 +37,7 @@ else return T_ELSE;
 , return T_COMA;
 ; return T_END_INSTRUCT;
 printf\(.*\) return T_PRINTF;
-[A-z][A-z0-9_]* return T_VARNAME;
+[A-z][A-z0-9_]* {yylval.v3 = strdup(yytext); return T_VARNAME;}
 
 %%
 int yywrap()

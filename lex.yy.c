@@ -781,27 +781,27 @@ return T_CLOSE_BRAC;
 case 3:
 YY_RULE_SETUP
 #line 10 "regle.lex"
-return T_CONST_TYPE;
+{yylval.v3 = strdup(yytext);return T_CONST_TYPE;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 11 "regle.lex"
-return T_INT_TYPE;
+{yylval.v3 = strdup(yytext);return T_INT_TYPE;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 12 "regle.lex"
-return T_FLOAT_TYPE;
+{yylval.v3 = strdup(yytext);return T_FLOAT_TYPE;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 13 "regle.lex"
-return T_DOUBLE_TYPE;
+{yylval.v3 = strdup(yytext);return T_DOUBLE_TYPE;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 14 "regle.lex"
-return T_INT;
+{yylval.v1 = atoi(yytext); return T_INT;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
@@ -922,7 +922,7 @@ return T_PRINTF;
 case 31:
 YY_RULE_SETUP
 #line 40 "regle.lex"
-return T_VARNAME;
+{yylval.v3 = strdup(yytext); return T_VARNAME;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP

@@ -32,7 +32,6 @@ void insertSymbol(Symbol_table * table_head, Symbol * s){
     Symbol_table * current;
 
     if(table_head->data == NULL){
-        s->addr = 0;
         table_head->data = s;
     }else{
      
@@ -41,7 +40,6 @@ void insertSymbol(Symbol_table * table_head, Symbol * s){
            current = current->next;
            i++;
         }
-        s->addr = i;
         current->next = malloc(sizeof(Symbol_table));
         current->next->data = s;
         current->next->next = NULL;
@@ -100,32 +98,25 @@ type 3 : double
 
 si 0 est renvoyé => problème recherche symbol dans table_head, gerer l'erreur
 */
-int getType(Symbol_table * table_head, char * name) {
-    Symbol_table * current;
-    
-    current = table_head;
-    while(current != NULL){
-        if(strcmp(current->data->name, name) == 0){
-            return current->data->type;
-        }
-        current = current->next;
-    }
+int getType(Symbol * s) {
+    s->type;
+}
 
+int getTypeByName(char * type) {
+    if (strcmp(type, "int")  == 0) {
+        return 1;
+    }
+    if (strcmp(type, "double") == 0) {
+        return 2;
+    }
+    if (strcmp(type, "float") == 0) {
+        return 2;
+    }
     return 0;
 }
 
-int getDepth(Symbol_table * table_head, char * name) {
-    Symbol_table * current;
-    
-    current = table_head;
-    while(current != NULL){
-        if(strcmp(current->data->name, name) == 0){
-            return current->data->depth;
-        }
-        current = current->next;
-    }
-
-    return 0;
+int getDepth(Symbol * s) {
+    s->depth;
 }
 
 void print_table(Symbol_table * table_head){
