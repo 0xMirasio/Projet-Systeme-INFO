@@ -15,8 +15,8 @@ compiler:
 	gcc -c symbol_table.c 
 	gcc -c opTable.c
 	gcc -c util.c
-	yacc -d $(GFN)
-	yacc $(GFN)
+	bison -d $(GFN)
+	bison $(GFN)
 	flex $(RFN)
 	gcc y.tab.c symbol_table.o opTable.o util.o lex.yy.c -o $(PG)
 

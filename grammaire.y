@@ -12,13 +12,9 @@ int global_pointer_INT = 0;
 int global_pointer_DOUBLE = 0;
 Symbol_table * head_table; 
 
-
-
 %}
 
-
-
-%union {int v1; double v2; char * v3;}
+%union {int v1; double v2; char * v3; void * v4;}
 %token T_OPEN_BRAC T_CLOSE_BRAC
 %token <v3> T_CONST_TYPE T_INT_TYPE T_FLOAT_TYPE T_DOUBLE_TYPE
 %token <v1> T_INT
@@ -41,6 +37,7 @@ Symbol_table * head_table;
 %token <v3> T_VARNAME 
 
 %type <v3> AFFECTATION VAR_TYPE
+%type <v4> EXPR NUMBER
 
 %right T_EQUALS
 
@@ -192,8 +189,9 @@ EXPR :
     
 
 NUMBER :  
-    	T_INT  
-    	| T_FLOAT ;
+    	T_INT {$$=$1;} 
+    	| T_FLOAT {$$=$1;}
+		 ;
 
 
 
