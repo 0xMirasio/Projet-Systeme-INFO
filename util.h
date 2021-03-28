@@ -5,5 +5,6 @@
 
 void print_output();
 void save_line(char* data);
+void init();
 
 #endif

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "opTable.h"
 
-#define MAX_SIZE 25
+#define MAX_SIZE 12
 
 
 operation opList[] = {
@@ -21,10 +21,10 @@ operation opList[] = {
    {"PRI", 12}
 };
 
-int getCode(operation table[], char * str){
-    for(int i=0; i<MAX_SIZE;i++){
-        if(strcmp( table[i].str, str ) == 0 ){
-            return table[i].code;
+int getCode(char * str){
+    for(int i=0; i<MAX_SIZE; i++){
+        if(strcmp( opList[i].str, str ) == 0 ){
+            return opList[i].code;
         }
     }
     return -1;

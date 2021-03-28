@@ -9,7 +9,7 @@
 #include <string.h>
 #include "symbol_table.h"
 
-Symbol * createSymbol(int type, char * name, unsigned int addr, int depth){
+Symbol * createSymbol(int type, char * name, void * addr, int depth){
     Symbol * s = malloc(sizeof(Symbol));
     s->type = type;
     s->name = malloc(strlen(name)+1);
@@ -86,7 +86,7 @@ int isInitialised(Symbol * s){
     return s->isInitialized;
 }
 
-unsigned int getAddress(Symbol * s){
+void * getAddress(Symbol * s){
     return s->addr;
 }
 

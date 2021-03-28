@@ -7,6 +7,6 @@ typedef struct operation {
     int code;
 } operation ;
 
-int getCode(operation table[], char * str);
+int getCode(char * str);
 
 #endif

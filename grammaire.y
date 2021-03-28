@@ -16,10 +16,11 @@ Symbol_table * head_table;
 headMZ * mem;
 int * memory_zone_INT;
 int * memory_zone_DOUBLE;
+char * lastType;
 
 %}
 
-%union {int v1; double v2; char * v3;}
+%union {int v1; double v2; char * v3; void * v4;}
 %token T_OPEN_BRAC T_CLOSE_BRAC
 %token <v3> T_CONST_TYPE T_INT_TYPE T_FLOAT_TYPE T_DOUBLE_TYPE
 %token <v1> T_INT
@@ -41,7 +42,10 @@ int * memory_zone_DOUBLE;
 %token T_PRINTF
 %token <v3> T_VARNAME 
 
+
 %type <v3> AFFECTATION VAR_TYPE
+%type <v4> NUMBER EXPR
+%type <v4> DECLARATION
 
 %right T_EQUALS
 
@@ -57,7 +61,9 @@ DEBUT : {
 		head_table = createHead();
 		memory_zone_INT = malloc(sizeof(int) * MAX_MEMORY_SIZE);
 		memory_zone_DOUBLE = malloc(sizeof(int) * MAX_MEMORY_SIZE); 
-		mem = init();
+		mem = initMem();
+		init();
+		lastType = malloc(30);
 
 		/*
 		int addr = 5;
@@ -68,7 +74,6 @@ DEBUT : {
 		} FUNCTIONS
 		{
 			print_table(head_table);
-			save_line("MOV 0 R1\n");
 			print_output();
 		}
 		; 
@@ -96,7 +101,8 @@ RETURN :
 	T_RETURN EXPR;
 
 DECLARATION : 
-		VAR_TYPE T_VARNAME SUITE_DECLARATION {
+		VAR_TYPE T_VARNAME SUITE_DECLARATION 
+			{
 
 			int type = getTypeByName($1);
 			if (type == 0) {
@@ -114,6 +120,7 @@ DECLARATION :
 			}
 			
     		insertSymbol(head_table, var);
+			setInitialized(var);
 
 			}
 		| VAR_TYPE AFFECTATION SUITE_DECLARATION {
@@ -132,6 +139,7 @@ DECLARATION :
 					global_pointer_DOUBLE++;	
 				}
     			insertSymbol(head_table, var);
+				setInitialized(var);
 			}
 		; 
 
@@ -183,21 +191,65 @@ CALL_SUITEPARAM :
 /* Arithmetic expression*/
 EXPR : 
 		EXPR T_ADD EXPR
-		| EXPR T_SUB EXPR
-		| EXPR T_MUL EXPR
-		| EXPR T_DIV EXPR
-		| T_OPEN_PAR EXPR T_CLOSE_PAR
-    	| T_VARNAME
+                    {
+                     printf("ADD %p %p %p\n", $1, $1, $3);
+                     $$ = $1;
+                    }
+        | EXPR T_SUB EXPR
+                    {
+                     printf("SUB %p %p %p\n",  $1, $1, $3);
+                     $$ = $1;
+                    }
+        | EXPR T_MUL EXPR
+                    {
+                     printf("MUL %p %p %p\n", $1, $1, $3);
+                     $$ = $1;
+                    }
+        | EXPR T_DIV EXPR
+                    {
+                     printf("DIV %p %p %p\n", $1, $1, $3);
+                     $$ = $1;
+                    }
+        | T_OPEN_PAR EXPR T_CLOSE_PAR
+                    {
+                     $$ = $2;
+                    }
+    	| T_VARNAME 
+			{
+			 Symbol * s = getSymbol(head_table, $1);
+			 if(isInitialised(s)){
+				void * addr = getAddress(s);
+				$$ = addr;
+			 }else{
+				printf("Var %s not initialised\n", $1);
+				exit(1);
+			 }
+			 
+			 
+			}
 		| CALL_FUNCTION
-    	| NUMBER
+    	| NUMBER 
+			{$$ = $1;}
 		;
     
 
 NUMBER :  
-    	T_INT {
-			printf("%d", $1);
-		} 
+    	T_INT 
+			{ void * addr = getFreeAddress(mem, getTypeByName("int"));
+			 int code = getCode("AFC");
+			 char toSave[30] = {0};
+			 sprintf(toSave, "AFC %p %d", addr, $1);
+			 save_line(toSave);
+			 $$ = addr;
+			}	 
     	| T_FLOAT
+			{ void * addr = getFreeAddress(mem, getTypeByName("float"));
+			 int code = getCode("AFC");
+			 char toSave[30] = {0};
+			 sprintf(toSave, "AFC %p %d", addr, $1);
+			 save_line(toSave);
+			 $$ = addr;
+			}	
 		 ;
 
 
@@ -230,6 +282,7 @@ SUITE_IF :
 
 
 %%
+
 int yyerror(void)
 { fprintf(stderr, "erreur de syntaxe\n"); return 1;}
 

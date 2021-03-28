@@ -3,18 +3,28 @@
 #include <string.h>
 #include "util.h"
 
+#define TAILLE_MAX 2000
 
-char output_code[5000][20];
-int line_pointer = 0;
+void init() {
+	system("echo '' > output_code");
+}
 
 void save_line(char* data){
-	strcpy(output_code[line_pointer], data);
-	line_pointer++;
+	char cmd[50];
+	sprintf(cmd, "echo '%s' >> output_code" , data);
+	system(cmd);
 }
 
 void print_output() {
-        printf("Output instructions:\n");
-        for(int i=0; i<line_pointer; i++) {
-			printf("\t%s\n", output_code[i]);
+	printf("ASM OUTPUT : \n");
+    FILE* fichier = NULL;
+	char chaine[TAILLE_MAX] = "";
+    fichier = fopen("output_code", "r+");
+	if (fichier != NULL)
+    {
+		while (fgets(chaine, TAILLE_MAX, fichier) != NULL) {
+			printf("%s", chaine);
 		}
+        fclose(fichier); 
+    }
 }

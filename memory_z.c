@@ -3,7 +3,7 @@
 #include <string.h>
 #include "memory_z.h"
 
-headMZ * init(void){
+headMZ * initMem(void){
     headMZ * head = malloc(sizeof(headMZ));
     head->begin = malloc(MZ_MAX);
     head->current = head->begin;
@@ -18,18 +18,11 @@ void * getFreeAddress(headMZ * head, int type){
         cpt = 8;
     }
     void * ret = head->current;
-    head->current += cpt;
+    int addr = head->current + cpt;
+    if(addr > ((int) head->begin) + MZ_MAX){
+        printf("impossible d'allouer plus\n");
+    }else{
+         head->current += cpt;
+    }
     return ret;
-}
-
-int main(){
-    headMZ * head = init();
-    printf("addr debut = %p, addr current = %p\n", head->begin, head->current);
-    void * addr = getFreeAddress(head, 1);
-    printf("addr debut = %p, addr current = %p\n", head->begin, addr);
-    addr = getFreeAddress(head, 2);
-    printf("addr debut = %p, addr current = %p\n", head->begin, addr);
-    addr = getFreeAddress(head, 2);
-    printf("addr debut = %p, addr current = %p\n", head->begin, addr);
-    return 0;
 }

@@ -8,7 +8,7 @@
 typedef struct {
 	int type;
 	char * name;
-	unsigned int addr;
+	void * addr;
 	int isInitialized;
 	int depth;
 } Symbol;
@@ -19,7 +19,7 @@ typedef struct Symbol_table {
 } Symbol_table;
 
 
-Symbol * createSymbol(int type, char * name, unsigned int addr, int depth);
+Symbol * createSymbol(int type, char * name, void * addr, int depth);
 
 
 Symbol_table * createHead(void);
@@ -29,7 +29,7 @@ void removeSymbol(Symbol_table * table_head, char * name);
 void setInitialized(Symbol * s);
 int isInitialised(Symbol * s);
 int getTypeByName(char * type);
-unsigned int getAddress(Symbol * s);
+void * getAddress(Symbol * s);
 int getType(Symbol * s);
 int getDepth(Symbol * s);
 void print_table(Symbol_table * table);
