@@ -4,3 +4,4 @@ test
 out
 y.tab.*
 lex.yy.c
+grammaire.tab.*
