@@ -11,6 +11,11 @@ test: compiler
 	gcc $(PGT).c symbol_table.o -o $(PGT)
 	./$(PGT)
 
+git: 
+	git add *
+	git commit -m "automated push via VSCODE"
+	git push
+	
 compiler:
 	gcc -c symbol_table.c 
 	gcc -c opTable.c
