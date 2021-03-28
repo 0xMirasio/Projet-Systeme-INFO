@@ -5,16 +5,21 @@
 #include "symbol_table.h"
 #include "util.h"
 #include "opTable.h"
+#include "memory_z.h"
+
 #define MAX_MEMORY_SIZE 100
 
 int global_depth = 0;
 int global_pointer_INT = 0;
 int global_pointer_DOUBLE = 0;
 Symbol_table * head_table; 
+headMZ * mem;
+int * memory_zone_INT;
+int * memory_zone_DOUBLE;
 
 %}
 
-%union {int v1; double v2; char * v3; void * v4;}
+%union {int v1; double v2; char * v3;}
 %token T_OPEN_BRAC T_CLOSE_BRAC
 %token <v3> T_CONST_TYPE T_INT_TYPE T_FLOAT_TYPE T_DOUBLE_TYPE
 %token <v1> T_INT
@@ -37,7 +42,6 @@ Symbol_table * head_table;
 %token <v3> T_VARNAME 
 
 %type <v3> AFFECTATION VAR_TYPE
-%type <v4> EXPR NUMBER
 
 %right T_EQUALS
 
@@ -51,8 +55,9 @@ Symbol_table * head_table;
 %%
 DEBUT : {
 		head_table = createHead();
-		int * memory_zone_INT = malloc(sizeof(int) * MAX_MEMORY_SIZE);
-		int * memory_zone_DOUBLE = malloc(sizeof(int) * MAX_MEMORY_SIZE); 
+		memory_zone_INT = malloc(sizeof(int) * MAX_MEMORY_SIZE);
+		memory_zone_DOUBLE = malloc(sizeof(int) * MAX_MEMORY_SIZE); 
+		mem = init();
 
 		/*
 		int addr = 5;
@@ -184,13 +189,15 @@ EXPR :
 		| T_OPEN_PAR EXPR T_CLOSE_PAR
     	| T_VARNAME
 		| CALL_FUNCTION
-    	| NUMBER {$$ = $1;}
+    	| NUMBER
 		;
     
 
 NUMBER :  
-    	T_INT {$$=$1;} 
-    	| T_FLOAT {$$=$1;}
+    	T_INT {
+			printf("%d", $1);
+		} 
+    	| T_FLOAT
 		 ;
 
 
