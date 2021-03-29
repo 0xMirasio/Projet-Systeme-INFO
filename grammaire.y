@@ -7,7 +7,9 @@
 #include "opTable.h"
 #include "memory_z.h"
 
-#define MAX_MEMORY_SIZE 100
+int yylex();
+int yyeror();
+
 
 int global_depth = 0;
 headMZ * global_pointer_zone;
@@ -54,7 +56,7 @@ int lastType;
 %left T_MUL T_DIV
 
 %%
-DEBUT : {
+DEBUT: {
 		head_table = createHead();
 		global_pointer_zone = initMem();
 		mem = initMem();
@@ -68,50 +70,51 @@ DEBUT : {
 		}
 		; 
 
-FUNCTIONS :
+FUNCTIONS:
 		DECLARE_FUNCTION FUNCTIONS
-		| ;
+		| 
+		;
 
-CORPS : 
+CORPS: 
     	T_OPEN_BRAC { global_depth++;} INSTRUCTIONS T_CLOSE_BRAC { global_depth--; }
+	;
 
-INSTRUCTIONS : 
+INSTRUCTIONS: 
 		INSTRUCTION INSTRUCTIONS 
-		| ; 
+		| 
+		; 
 
-INSTRUCTION : 
+INSTRUCTION: 
 		DECLARATION T_END_INSTRUCT
 		| AFFECTATION T_END_INSTRUCT
 		| CALL_FUNCTION T_END_INSTRUCT
 		| IF 
 		| T_PRINTF T_END_INSTRUCT
-		| RETURN T_END_INSTRUCT; 
-
-RETURN :
-	T_RETURN EXPR;
-
-DECLARATION : 
-		VAR_TYPE T_VARNAME SUITE_DECLARATION 
-			{
-				int type = getTypeByName($1);
-				if (type == 0) {
-					printf("ERROR : Type not found !!!\n");
-					exit(1);
-				}
-				Symbol * var;
-				void * addr = getFreeAddress(global_pointer_zone, lastType);
-				var = createSymbol(type, $2, addr, global_depth);
-				insertSymbol(head_table, var);
-			}
-		| VAR_TYPE AFFECTATION SUITE_DECLARATION 
+		| RETURN T_END_INSTRUCT
 		; 
 
-SUITE_DECLARATION :
+RETURN:
+	T_RETURN EXPR;
+
+DECLARATION: 
+		VAR_TYPE T_VARNAME SUITE_DECLARATION 
+			{
+				Symbol * s;
+				void * addr = getFreeAddress(global_pointer_zone, lastType);
+				s = createSymbol(lastType, $2, addr, global_depth);
+				insertSymbol(head_table, s);
+				$$ = addr;
+			}
+		| VAR_TYPE AFFECTATION SUITE_DECLARATION {$$ = $2;}
+		; 
+
+SUITE_DECLARATION:
 		T_COMA T_VARNAME SUITE_DECLARATION 
 		| T_COMA AFFECTATION SUITE_DECLARATION 
-		| ;
+		| 
+		;
 
-AFFECTATION : 
+AFFECTATION: 
 		T_VARNAME T_EQUALS EXPR
 			{
 				Symbol * s = getSymbol(head_table, $1);
@@ -123,48 +126,57 @@ AFFECTATION :
 				setInitialized(s);
 				void * addr = getAddress(s);
 				printf("COP %p %p\n",addr, $3);
-				$$ = $3;
+				$$ = addr;
 			}
+		;
 
-VAR_TYPE : 
-		T_FLOAT_TYPE {$$ = $1;}
-		| T_DOUBLE_TYPE  {$$ = $1;}
-		| T_INT_TYPE {$$ = $1;}
+VAR_TYPE: 
+		T_FLOAT_TYPE {lastType = getTypeByName($1);}
+		| T_DOUBLE_TYPE  {lastType = getTypeByName($1);}
+		| T_INT_TYPE {lastType = getTypeByName($1);}
 		;
 
 /* Function declaration */
-DECLARE_FUNCTION : 
-		VAR_TYPE T_VARNAME T_OPEN_PAR DECLARE_PARAMETERS T_CLOSE_PAR CORPS;
+DECLARE_FUNCTION: 
+		VAR_TYPE T_VARNAME T_OPEN_PAR DECLARE_PARAMETERS T_CLOSE_PAR CORPS
+		;
 
-DECLARE_PARAMETERS : 
+DECLARE_PARAMETERS: 
 		DECLARE_PARAMETER DECLARE_SUITEPARAM
-		| ;
+		| 
+		;
 
-DECLARE_PARAMETER :
-		VAR_TYPE T_VARNAME ;
+DECLARE_PARAMETER:
+		VAR_TYPE T_VARNAME 
+		;
 
-DECLARE_SUITEPARAM :
+DECLARE_SUITEPARAM:
 		T_COMA DECLARE_PARAMETER DECLARE_SUITEPARAM
-		| ;
+		| 
+		;
 
 
 /* Function call */
-CALL_FUNCTION : 
-		T_VARNAME T_OPEN_PAR CALL_PARAMETERS T_CLOSE_PAR;
+CALL_FUNCTION: 
+		T_VARNAME T_OPEN_PAR CALL_PARAMETERS T_CLOSE_PAR
+		;
 
-CALL_PARAMETERS : 
+CALL_PARAMETERS: 
 		CALL_PARAMETER CALL_SUITEPARAM
-		| ;
+		| 
+		;
 
-CALL_PARAMETER : T_VARNAME;
+CALL_PARAMETER: T_VARNAME
+		;
 
-CALL_SUITEPARAM :
+CALL_SUITEPARAM:
 		T_COMA CALL_PARAMETER CALL_SUITEPARAM
-		| ;
+		| 
+		;
 
 
 /* Arithmetic expression*/
-EXPR : 
+EXPR: 
 		EXPR T_ADD EXPR
                     {
                      printf("ADD %p %p %p\n", $1, $1, $3);
@@ -210,7 +222,7 @@ EXPR :
 		;
     
 
-NUMBER :  
+NUMBER:  
     	T_INT 
 			{ void * addr = getFreeAddress(mem, getTypeByName("int"));
 			 printf("AFC %p %d\n", addr, $1);
@@ -226,7 +238,7 @@ NUMBER :
 
 
 /* Logical condition */
-CONDITION :
+CONDITION:
 		CONDITION T_LOGICAL_AND CONDITION
 		| CONDITION T_LOGICAL_OR CONDITION
 		| CONDITION T_LOGICAL_EQ CONDITION
@@ -238,18 +250,20 @@ CONDITION :
 		| T_OPEN_PAR CONDITION T_CLOSE_PAR
 		| T_OPEN_PAR AFFECTATION T_CLOSE_PAR
     	| T_VARNAME
-    	| NUMBER;
+    	| NUMBER
+		;
 
 
 
 /* If; Else If; Else */
-IF :
+IF:
     	T_IF CONDITION CORPS SUITE_IF ;
 
-SUITE_IF : 
+SUITE_IF: 
 		T_ELSE T_IF CONDITION CORPS SUITE_IF
 		| T_ELSE CORPS
-		| ;
+		| 
+		;
 
 
 %%

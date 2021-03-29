@@ -18,8 +18,8 @@ void * getFreeAddress(headMZ * head, int type){
         cpt = sizeof(double);
     }
     void * ret = head->current;
-    int addr = head->current + cpt;
-    if(addr > ((int) head->begin) + MZ_MAX){
+    void * addr =  head->current + cpt;
+    if(addr > head->begin + MZ_MAX){
         printf("impossible d'allouer plus\n");
     }else{
          head->current += cpt;

@@ -121,21 +121,21 @@ void print_table(Symbol_table * table_head){
     Symbol_table * current;
     int i = 0;
 
-    printf("-------------------------------------------------------------------------\n");
-    printf("|                               Symbol Table                            |\n");
-    printf("-------------------------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------------------------\n");
+    printf("|                               Symbol Table                                      |\n");
+    printf("-----------------------------------------------------------------------------------\n");
     printf("| Index |   Type   |    Name    |        Address        | Depth |  IsInitialized  |\n");
-    printf("-------------------------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------------------------\n");
     current = table_head;
     while(current->next != NULL){
         current = current->next;
 
-        printf("|   %-4d|    %-6d|     %-7s|   %-17p|   %-4d|       %-10d|\n", i, current->data->type, current->data->name,
+        printf("|   %-4d|    %-6d|     %-7s|      %-17p|   %-4d|       %-10d|\n", i, current->data->type, current->data->name,
         current->data->addr, current->data->depth, current->data->isInitialized);
         i++;
     }
 
-    printf("-------------------------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------------------------\n");
 
 }
 // *( (int *) global);
