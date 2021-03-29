@@ -4,18 +4,17 @@
 #include <string.h>
 #include "symbol_table.h"
 #include "util.h"
+#include "opTable.h"
 #include "memory_z.h"
 
 #define MAX_MEMORY_SIZE 100
 
 int global_depth = 0;
-void * global_pointer_INT = 0;
-void * global_pointer_DOUBLE = 0;
+headMZ * global_pointer_zone;
 Symbol_table * head_table; 
 headMZ * mem;
-int * memory_zone_INT;
-int * memory_zone_DOUBLE;
-int ltype;
+int lastType;
+
 %}
 
 %union {int v1; double v2; char * v3; void * v4;}
@@ -41,8 +40,9 @@ int ltype;
 %token <v3> T_VARNAME 
 
 
-%type <v3> AFFECTATION VAR_TYPE 
-%type <v4> NUMBER EXPR DECLARATION CALL_FUNCTION
+%type <v3> AFFECTATION VAR_TYPE
+%type <v4> NUMBER EXPR
+%type <v4> DECLARATION
 
 %right T_EQUALS
 
@@ -56,16 +56,10 @@ int ltype;
 %%
 DEBUT : {
 		head_table = createHead();
-		memory_zone_INT = malloc(sizeof(int) * MAX_MEMORY_SIZE);
-		memory_zone_DOUBLE = malloc(sizeof(int) * MAX_MEMORY_SIZE); 
+		global_pointer_zone = initMem();
 		mem = initMem();
 		init();
-
-		/*
-		int addr = 5;
-		*(memory_zone_INT+sizeof(int)*addr) = 5;
-		printf("%d", *(memory_zone_INT+sizeof(int)*addr));
-		*/
+		lastType = 1;
 
 		} FUNCTIONS
 		{
@@ -99,45 +93,17 @@ RETURN :
 DECLARATION : 
 		VAR_TYPE T_VARNAME SUITE_DECLARATION 
 			{
-			int type = getTypeByName($1);
-			if (type == 0) {
-				printf("ERROR : Type not found !!!\n");
-				exit(1);
-			}
-			Symbol * var;
-			if (type == 1) {
-				var = createSymbol(type, $2, global_pointer_INT, global_depth);
-				global_pointer_INT += sizeof(int);
-			}
-			if (type == 2) {
-				var = createSymbol(type, $2, global_pointer_DOUBLE, global_depth);
-				global_pointer_DOUBLE += sizeof(double);
-					
-			}
-			
-    		insertSymbol(head_table, var);
-			setInitialized(var);
-
-			}
-		| VAR_TYPE AFFECTATION SUITE_DECLARATION {
-				
 				int type = getTypeByName($1);
 				if (type == 0) {
 					printf("ERROR : Type not found !!!\n");
 					exit(1);
 				}
 				Symbol * var;
-				if (type == 1) {
-					var = createSymbol(type, $2, global_pointer_INT, global_depth);
-					global_pointer_INT += sizeof(int);
-				}
-				if (type == 2) {
-					var = createSymbol(type, $2, global_pointer_DOUBLE, global_depth);
-					global_pointer_DOUBLE += sizeof(float);
-				}
-    			insertSymbol(head_table, var);
-				setInitialized(var);
+				void * addr = getFreeAddress(global_pointer_zone, lastType);
+				var = createSymbol(type, $2, addr, global_depth);
+				insertSymbol(head_table, var);
 			}
+		| VAR_TYPE AFFECTATION SUITE_DECLARATION 
 		; 
 
 SUITE_DECLARATION :
@@ -146,19 +112,18 @@ SUITE_DECLARATION :
 		| ;
 
 AFFECTATION : 
-		T_VARNAME T_EQUALS EXPR {
-			char toSave[30] = {0};
-			printf("%s", $1);
-			print_table(head_table);
-			Symbol * s = getSymbol(head_table, $1);
-			if (s == NULL) {
-				printf("Affectation sur une variable non initialisé !!!");
-				exit(1);
-			}
-			void * addr = getAddress(s);
-			sprintf(toSave, "COP %p %p", addr, $3);
-			save_line(toSave);
-			$$ = $1;
+		T_VARNAME T_EQUALS EXPR
+			{
+				Symbol * s = getSymbol(head_table, $1);
+				if(s == NULL){
+					void * addrSym = getFreeAddress(global_pointer_zone, lastType);
+					s = createSymbol(lastType, $1, addrSym, global_depth);
+					insertSymbol(head_table, s);
+				}
+				setInitialized(s);
+				void * addr = getAddress(s);
+				printf("COP %p %p\n",addr, $3);
+				$$ = $3;
 			}
 
 VAR_TYPE : 
@@ -185,9 +150,7 @@ DECLARE_SUITEPARAM :
 
 /* Function call */
 CALL_FUNCTION : 
-		T_VARNAME T_OPEN_PAR CALL_PARAMETERS T_CLOSE_PAR
-		 {void * a=1;
-		 $$ = a;};
+		T_VARNAME T_OPEN_PAR CALL_PARAMETERS T_CLOSE_PAR;
 
 CALL_PARAMETERS : 
 		CALL_PARAMETER CALL_SUITEPARAM
@@ -229,14 +192,16 @@ EXPR :
     	| T_VARNAME 
 			{
 			 Symbol * s = getSymbol(head_table, $1);
-			 if(isInitialised(s)){
+			 if(s != NULL && isInitialised(s)){
+				int varType = getType(s); 
 				void * addr = getAddress(s);
-				$$ = addr;
+				void * tmp = getFreeAddress(mem, varType);
+				printf("COP %p %p\n", tmp, addr);
+				$$ = tmp;
 			 }else{
 				printf("Var %s not initialised\n", $1);
 				exit(1);
 			 }
-			 
 			 
 			}
 		| CALL_FUNCTION
@@ -248,16 +213,12 @@ EXPR :
 NUMBER :  
     	T_INT 
 			{ void * addr = getFreeAddress(mem, getTypeByName("int"));
-			 char toSave[30] = {0};
-			 sprintf(toSave, "AFC %p %d", addr, $1);
-			 save_line(toSave);
+			 printf("AFC %p %d\n", addr, $1);
 			 $$ = addr;
 			}	 
     	| T_FLOAT
 			{ void * addr = getFreeAddress(mem, getTypeByName("float"));
-			 char toSave[30] = {0};
-			 sprintf(toSave, "AFC %p %d", addr, $1);
-			 save_line(toSave);
+			 printf("AFC %p %f\n", addr, $1);
 			 $$ = addr;
 			}	
 		 ;

@@ -9,8 +9,8 @@
 #include <string.h>
 #include "symbol_table.h"
 
-Symbol * createSymbol(int type, char * name, void * addr, int depth){
-    Symbol * s = malloc(sizeof(Symbol));
+Symbol * createSymbol(int type, char *name, void *addr, int depth){
+    Symbol *s = malloc(sizeof(Symbol));
     s->type = type;
     s->name = malloc(strlen(name)+1);
     strcpy(s->name, name);
@@ -28,22 +28,16 @@ Symbol_table * createHead(void){
 }
 
 void insertSymbol(Symbol_table * table_head, Symbol * s){
-    unsigned int i = 1;
     Symbol_table * current;
 
-    if(table_head->data == NULL){
-        table_head->data = s;
-    }else{
-     
-        current = table_head;
-        while(current->next != NULL){
-           current = current->next;
-           i++;
-        }
-        current->next = malloc(sizeof(Symbol_table));
-        current->next->data = s;
-        current->next->next = NULL;
+    current = table_head;
+    while(current->next != NULL){
+        current = current->next;
     }
+    current->next = malloc(sizeof(Symbol_table));
+    current->next->data = s;
+    current->next->next = NULL;
+    
 }
 
 void removeSymbol(Symbol_table * table_head, char * name) {
@@ -51,27 +45,31 @@ void removeSymbol(Symbol_table * table_head, char * name) {
     Symbol_table * current;
     
     current = table_head;
-    while(current != NULL){
+    while(current->next != NULL){
+        current = current->next;
+
         if(strcmp(current->data->name, name) == 0){
             current->data->isInitialized = 0;
             current->data->depth = 0;
             current->data->type = 0;
             current->data->name = "FREE";
         }
-        current = current->next;
+        
     }
 }
 
 Symbol * getSymbol(Symbol_table * table_head, char * name){
    
+    
     Symbol_table * current;
     
     current = table_head;
-    while(current != NULL){
+    while(current->next != NULL){
+        current = current->next;
+        
         if(strcmp(current->data->name, name) == 0){
             return current->data;
         }
-        current = current->next;
     }
 
     return NULL;
@@ -86,7 +84,7 @@ int isInitialised(Symbol * s){
     return s->isInitialized;
 }
 
-void * getAddress(Symbol * s){
+void *getAddress(Symbol * s){
     return s->addr;
 }
 
@@ -126,16 +124,31 @@ void print_table(Symbol_table * table_head){
     printf("-------------------------------------------------------------------------\n");
     printf("|                               Symbol Table                            |\n");
     printf("-------------------------------------------------------------------------\n");
-    printf("| Index |   Type   |    Name    |   Address   | Depth |  IsInitialized  |\n");
+    printf("| Index |   Type   |    Name    |        Address        | Depth |  IsInitialized  |\n");
     printf("-------------------------------------------------------------------------\n");
     current = table_head;
-    while(current != NULL){
-        printf("|   %-4d|    %-6d|     %-7s|      %-7d|   %-4d|       %-10d|\n", i, current->data->type, current->data->name,
-        current->data->addr, current->data->depth, current->data->isInitialized);
+    while(current->next != NULL){
         current = current->next;
+
+        printf("|   %-4d|    %-6d|     %-7s|   %-17p|   %-4d|       %-10d|\n", i, current->data->type, current->data->name,
+        current->data->addr, current->data->depth, current->data->isInitialized);
         i++;
     }
 
     printf("-------------------------------------------------------------------------\n");
 
 }
+// *( (int *) global);
+// int main(){
+//     Symbol_table * head = createHead();
+
+//     Symbol *s = createSymbol(1,"b",0,2);
+//     Symbol *s1 = createSymbol(1,"a",1,3);
+//     insertSymbol(head, s);
+//     insertSymbol(head, s1);
+//     Symbol *x = getSymbol(head, "b");
+//     printf("name = %s, type = %d\n", x->name, x->type);
+//     Symbol *y = getSymbol(head, "c");
+//     printf("exist : %d\n", y == NULL);
+//     print_table(head);
+// }
