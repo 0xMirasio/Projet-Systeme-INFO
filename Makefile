@@ -1,5 +1,4 @@
 PG = main
-PGT = test
 
 GFN = grammaire.y
 RFN = regle.lex
@@ -24,7 +23,7 @@ compiler:
 	yacc -d $(GFN)
 	yacc $(GFN)
 	flex $(RFN)
-	gcc y.tab.c symbol_table.o opTable.o util.o memory_z.o lex.yy.c -o $(PG)
+	gcc y.tab.c symbol_table.o util.o memory_z.o lex.yy.c -o $(PG)
 
 clean:
-	rm *.o $(PGT) y.tab.* $(PG) lex.yy.c
+	rm *.o $(PGT) y.tab.* lex.yy.c

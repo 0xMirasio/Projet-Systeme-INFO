@@ -4,20 +4,18 @@
 #include <string.h>
 #include "symbol_table.h"
 #include "util.h"
-#include "opTable.h"
 #include "memory_z.h"
 
 #define MAX_MEMORY_SIZE 100
 
 int global_depth = 0;
-int global_pointer_INT = 0;
-int global_pointer_DOUBLE = 0;
+void * global_pointer_INT = 0;
+void * global_pointer_DOUBLE = 0;
 Symbol_table * head_table; 
 headMZ * mem;
 int * memory_zone_INT;
 int * memory_zone_DOUBLE;
-char * lastType;
-
+int ltype;
 %}
 
 %union {int v1; double v2; char * v3; void * v4;}
@@ -43,9 +41,8 @@ char * lastType;
 %token <v3> T_VARNAME 
 
 
-%type <v3> AFFECTATION VAR_TYPE
-%type <v4> NUMBER EXPR
-%type <v4> DECLARATION
+%type <v3> AFFECTATION VAR_TYPE 
+%type <v4> NUMBER EXPR DECLARATION CALL_FUNCTION
 
 %right T_EQUALS
 
@@ -63,7 +60,6 @@ DEBUT : {
 		memory_zone_DOUBLE = malloc(sizeof(int) * MAX_MEMORY_SIZE); 
 		mem = initMem();
 		init();
-		lastType = malloc(30);
 
 		/*
 		int addr = 5;
@@ -103,7 +99,6 @@ RETURN :
 DECLARATION : 
 		VAR_TYPE T_VARNAME SUITE_DECLARATION 
 			{
-
 			int type = getTypeByName($1);
 			if (type == 0) {
 				printf("ERROR : Type not found !!!\n");
@@ -112,11 +107,12 @@ DECLARATION :
 			Symbol * var;
 			if (type == 1) {
 				var = createSymbol(type, $2, global_pointer_INT, global_depth);
-				global_pointer_INT++;
+				global_pointer_INT += sizeof(int);
 			}
 			if (type == 2) {
 				var = createSymbol(type, $2, global_pointer_DOUBLE, global_depth);
-				global_pointer_DOUBLE++;	
+				global_pointer_DOUBLE += sizeof(double);
+					
 			}
 			
     		insertSymbol(head_table, var);
@@ -124,6 +120,7 @@ DECLARATION :
 
 			}
 		| VAR_TYPE AFFECTATION SUITE_DECLARATION {
+				
 				int type = getTypeByName($1);
 				if (type == 0) {
 					printf("ERROR : Type not found !!!\n");
@@ -132,11 +129,11 @@ DECLARATION :
 				Symbol * var;
 				if (type == 1) {
 					var = createSymbol(type, $2, global_pointer_INT, global_depth);
-					global_pointer_INT++;
+					global_pointer_INT += sizeof(int);
 				}
 				if (type == 2) {
 					var = createSymbol(type, $2, global_pointer_DOUBLE, global_depth);
-					global_pointer_DOUBLE++;	
+					global_pointer_DOUBLE += sizeof(float);
 				}
     			insertSymbol(head_table, var);
 				setInitialized(var);
@@ -149,7 +146,20 @@ SUITE_DECLARATION :
 		| ;
 
 AFFECTATION : 
-		T_VARNAME T_EQUALS EXPR {$$ = $1;}
+		T_VARNAME T_EQUALS EXPR {
+			char toSave[30] = {0};
+			printf("%s", $1);
+			print_table(head_table);
+			Symbol * s = getSymbol(head_table, $1);
+			if (s == NULL) {
+				printf("Affectation sur une variable non initialisé !!!");
+				exit(1);
+			}
+			void * addr = getAddress(s);
+			sprintf(toSave, "COP %p %p", addr, $3);
+			save_line(toSave);
+			$$ = $1;
+			}
 
 VAR_TYPE : 
 		T_FLOAT_TYPE {$$ = $1;}
@@ -175,7 +185,9 @@ DECLARE_SUITEPARAM :
 
 /* Function call */
 CALL_FUNCTION : 
-		T_VARNAME T_OPEN_PAR CALL_PARAMETERS T_CLOSE_PAR;
+		T_VARNAME T_OPEN_PAR CALL_PARAMETERS T_CLOSE_PAR
+		 {void * a=1;
+		 $$ = a;};
 
 CALL_PARAMETERS : 
 		CALL_PARAMETER CALL_SUITEPARAM
@@ -236,7 +248,6 @@ EXPR :
 NUMBER :  
     	T_INT 
 			{ void * addr = getFreeAddress(mem, getTypeByName("int"));
-			 int code = getCode("AFC");
 			 char toSave[30] = {0};
 			 sprintf(toSave, "AFC %p %d", addr, $1);
 			 save_line(toSave);
@@ -244,7 +255,6 @@ NUMBER :
 			}	 
     	| T_FLOAT
 			{ void * addr = getFreeAddress(mem, getTypeByName("float"));
-			 int code = getCode("AFC");
 			 char toSave[30] = {0};
 			 sprintf(toSave, "AFC %p %d", addr, $1);
 			 save_line(toSave);

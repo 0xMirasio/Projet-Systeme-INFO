@@ -13,9 +13,9 @@ headMZ * initMem(void){
 void * getFreeAddress(headMZ * head, int type){
     int cpt = 0;
     if(type == 1){
-        cpt = 4;
+        cpt = sizeof(int);
     }else if (type == 2){
-        cpt = 8;
+        cpt = sizeof(double);
     }
     void * ret = head->current;
     int addr = head->current + cpt;

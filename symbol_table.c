@@ -99,7 +99,7 @@ type 3 : double
 si 0 est renvoyé => problème recherche symbol dans table_head, gerer l'erreur
 */
 int getType(Symbol * s) {
-    s->type;
+    return s->type;
 }
 
 int getTypeByName(char * type) {
@@ -116,7 +116,7 @@ int getTypeByName(char * type) {
 }
 
 int getDepth(Symbol * s) {
-    s->depth;
+    return s->depth;
 }
 
 void print_table(Symbol_table * table_head){
