@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symbol_table.h"
-#include "util.h"
 #include "opTable.h"
 #include "memory_z.h"
 
@@ -60,13 +59,11 @@ DEBUT: {
 		head_table = createHead();
 		global_pointer_zone = initMem();
 		mem = initMem();
-		init();
 		lastType = 1;
 
 		} FUNCTIONS
 		{
 			print_table(head_table);
-			print_output();
 		}
 		; 
 
