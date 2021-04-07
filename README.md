@@ -22,6 +22,9 @@ sudo apt-get install make
 ```
 
 Compilé et testé sur : ```Linux 5.4.0-70-generic #78~18.04.1-Ubuntu  ```
+```make 4.1```
+```Bison 3.0.4```
+```flex 2.6.4```
 
 
 ## Usage
