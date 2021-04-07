@@ -21,20 +21,21 @@ Package make needed to install Projet-Systeme-INFO.
 sudo apt-get install make
 ```
 
-Compilé et testé sur : ```Linux 5.4.0-70-generic #78~18.04.1-Ubuntu  ```
-```make 4.1```
-```Bison 3.0.4```
-```flex 2.6.4```
+Compilé et testé sur : ```
+Linux 5.4.0-70-generic #78~18.04.1-Ubuntu
+make 4.1
+Bison 3.0.4
+flex 2.6.4```
 
 
 ## Usage
 
-Compilation et lancement du générateur pour le fichier example.c + compilation interpreteur
+Compilation du générateur et interpréteur
 ```bash
 make
 ```
 
-lancement de l'interpreteur sur input.txt (generé par le générateur)
+lancement du générateur (in: example.c , out:input.txt) puis lancement intépreteur (in : input.txt)
 ```bash
 make run
 ```
