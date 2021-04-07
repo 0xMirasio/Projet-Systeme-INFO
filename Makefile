@@ -4,8 +4,8 @@ RFN = regle.lex
 SRCC:= ./src/*.c
 INTER = interpreter
 
+
 default: compiler
-	./$(PG) < example.c
 	
 compiler: ./src/$(INTER).y ./src/$(GFN) ./src/$(RFN) ./src/$(INTER).l ./src/instructions.c libraries
 	yacc -d src/$(GFN)
@@ -25,5 +25,6 @@ libraries: ./src/symbol_table.c ./src/opTable.c ./src/memory_z.c ./src/util.c
 	gcc -c src/memory_z.c
 	gcc -c src/util.c
 
-run:
+run: 
+	./$(PG) < example.c
 	./$(INTER) < input.txt
