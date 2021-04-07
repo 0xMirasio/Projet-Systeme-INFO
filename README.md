@@ -26,9 +26,14 @@ Compilé et testé sur : ```Linux 5.4.0-70-generic #78~18.04.1-Ubuntu  ```
 
 ## Usage
 
-Compilation et lancement du générateur pour le fichier example.c
+Compilation et lancement du générateur pour le fichier example.c + compilation interpreteur
 ```bash
 make
+```
+
+lancement de l'interpreteur sur input.txt (generé par le générateur)
+```bash
+make run
 ```
 
 Vider le dossier des fichiers automatiquement crées : 
