@@ -17,8 +17,9 @@ int global_depth = 0;
 headMZ * global_pointer_zone;
 Symbol_table * head_table; 
 headMZ * mem;
-int lastType;
+int lastType, cptInstr;
 int eip = 0;
+char * instrArray[MAX_INSTRUCT];
 
 %}
 
@@ -59,20 +60,31 @@ int eip = 0;
 %left T_MUL T_DIV
 
 %%
-DEBUT: {
-		head_table = createHead();
-		global_pointer_zone = initMem(2000,3000);
-		mem = initMem(0,1000);
-		init();
-		lastType = 1;
-
-		} FUNCTIONS
+DEBUT:  
+	FUNCTIONS
 		{
-			print_table(head_table);
-			printf("EIP : %d\n", eip);
-			printf("--------------------------------------------------\n");
+		save_all_lines(instrArray, cptInstr);
+		print_table(head_table);
+		printf("EIP : %d\n", eip);
+		printf("--------------------------------------------------\n");
 		}
+	; 
 		; 
+	; 
+		; 
+	; 
+		; 
+	; 
+		; 
+	; 
+		; 
+	; 
+		; 
+	; 
+		; 
+	; 
+		; 
+	; 
 
 FUNCTIONS:
 		DECLARE_FUNCTION FUNCTIONS
@@ -80,7 +92,7 @@ FUNCTIONS:
 		;
 
 CORPS: 
-    	T_OPEN_BRAC { global_depth++;} INSTRUCTIONS T_CLOSE_BRAC { global_depth--; }
+    T_OPEN_BRAC { global_depth++;} INSTRUCTIONS T_CLOSE_BRAC { global_depth--; }
 	;
 
 INSTRUCTIONS: 
@@ -99,52 +111,52 @@ INSTRUCTION:
 		; 
 
 RETURN:
-	T_RETURN RET_EXPR {
+	T_RETURN RET_EXPR 
+		{
 		printf("0x%d PRI %d\n", eip, $2);
-		char * data = malloc(sizeof(char) * MAX_SIZE);
-		sprintf(data, "PRI %d\n", $2);
-		save_line(data);
+		instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+		sprintf(instrArray[cptInstr], "PRI %d\n", $2);
+		cptInstr++;
 		eip++;
-	}
+		}
 	;
 
 RET_EXPR: 
-		EXPR T_ADD RET_EXPR
-                    {
-                     printf("0x%d ADD %d %d %d\n", eip, $1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "ADD %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-					 eip++;
-                     $$ = $1;
-                    }
-        | EXPR T_SUB RET_EXPR
-                    {
-                     printf("0x%d SUB %d %d %d\n", eip, $1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "SUB %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-					 eip++;
-                     $$ = $1;
-                    }
-        | EXPR T_MUL RET_EXPR
-                    {
-                     printf("0x%d MUL %d %d %d\n",eip, $1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "MUL %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-					 eip++;
-                     $$ = $1;
-                    }
-        | EXPR T_DIV RET_EXPR
-                    {
-                     printf("0x%d DIV %d %d %d\n",eip, $1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "DIV %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-					 eip++;
-                     $$ = $1;
-                    }
+		RET_EXPR T_ADD RET_EXPR
+			{
+			printf("0x%d ADD %d %d %d\n",eip, $1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "ADD %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			eip++;
+			$$ = $1;
+			}
+        | RET_EXPR T_SUB RET_EXPR
+            {
+			printf("0x%d SUB %d %d %d\n", eip, $1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "SUB %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			eip++;
+			$$ = $1;
+			}
+        | RET_EXPR T_MUL RET_EXPR
+            {
+			printf("0x%d MUL %d %d %d\n",eip, $1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "MUL %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			$$ = $1;
+			}
+        | RET_EXPR T_DIV RET_EXPR
+            {
+			printf("0x%d DIV %d %d %d\n", eip,$1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "DIV %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			eip++;
+			$$ = $1;
+			}
         | T_OPEN_PAR RET_EXPR T_CLOSE_PAR
                     {
                      $$ = $2;
@@ -157,9 +169,9 @@ RET_EXPR:
 				int addr = getAddress(s);
 				int tmp = getFreeAddress(mem, varType);
 				printf("0x%d COP %d %d\n", eip,tmp, addr);
-				char * data = malloc(sizeof(char) * MAX_SIZE);
-				sprintf(data, "COP %d %d\n",tmp, addr);
-				save_line(data);
+				instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+				sprintf(instrArray[cptInstr], "COP %d %d\n",tmp, addr);
+				cptInstr++;
 				eip++;
 				$$ = tmp;
 			 }else{
@@ -203,9 +215,9 @@ AFFECTATION:
 				setInitialized(s);
 				int addr = getAddress(s);
 				printf("0x%d COP %d %d\n",eip,addr, $3);
-				char * data = malloc(sizeof(char) * MAX_SIZE);
-				sprintf(data, "COP %d %d\n",addr, $3);
-				save_line(data);
+				instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+				sprintf(instrArray[cptInstr], "COP %d %d\n", addr, $3);
+				cptInstr++;
 				eip++;
 				$$ = addr;
 			}
@@ -259,44 +271,44 @@ CALL_SUITEPARAM:
 /* Arithmetic expression*/
 EXPR: 
 		EXPR T_ADD EXPR
-                    {
-                     printf("0x%d ADD %d %d %d\n",eip, $1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "ADD %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-					 eip++;
-                     $$ = $1;
-                    }
+			{
+			printf("0x%d ADD %d %d %d\n",eip, $1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "ADD %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			eip++;
+			$$ = $1;
+			}
         | EXPR T_SUB EXPR
-                    {
-                     printf("0x%d SUB %d %d %d\n", eip, $1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "SUB %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-					 eip++;
-                     $$ = $1;
-                    }
+			{
+			printf("0x%d SUB %d %d %d\n", eip, $1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "SUB %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			eip++;
+			$$ = $1;
+			}
         | EXPR T_MUL EXPR
-                    {
-                     printf("0x%d MUL %d %d %d\n",eip, $1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "MUL %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-                     $$ = $1;
-                    }
+			{
+			printf("0x%d MUL %d %d %d\n",eip, $1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "MUL %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			$$ = $1;
+			}
         | EXPR T_DIV EXPR
-                    {
-                     printf("0x%d DIV %d %d %d\n", eip,$1, $1, $3);
-					 char * data = malloc(sizeof(char) * MAX_SIZE);
-					 sprintf(data, "DIV %d %d %d\n", $1, $1, $3);
-					 save_line(data);
-					 eip++;
-                     $$ = $1;
-                    }
+			{
+			printf("0x%d DIV %d %d %d\n", eip,$1, $1, $3);
+			instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			sprintf(instrArray[cptInstr], "DIV %d %d %d\n", $1, $1, $3);
+			cptInstr++;
+			eip++;
+			$$ = $1;
+			}
         | T_OPEN_PAR EXPR T_CLOSE_PAR
-                    {
-                     $$ = $2;
-                    }
+			{
+			$$ = $2;
+			}
     	| T_VARNAME 
 			{
 			 Symbol * s = getSymbol(head_table, $1);
@@ -305,9 +317,9 @@ EXPR:
 				int addr = getAddress(s);
 				int tmp = getFreeAddress(mem, varType);
 				printf("0x%d COP %d %d\n", eip,tmp, addr);
-				char * data = malloc(sizeof(char) * MAX_SIZE);
-				sprintf(data, "COP %d %d\n",tmp, addr);
-				save_line(data);
+				instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+				sprintf(instrArray[cptInstr], "COP %d %d\n",tmp, addr);
+				cptInstr++;
 				eip++;
 				$$ = tmp;
 			 }else{
@@ -326,18 +338,18 @@ NUMBER:
     	T_INT 
 			{ int addr = getFreeAddress(mem, getTypeByName("int"));
 			 printf("0x%d AFC %d %d\n", eip,addr, $1);
-			 char * data = malloc(sizeof(char) * MAX_SIZE);
-			 sprintf(data, "AFC %d %d\n",addr, $1);
-			 save_line(data);
+			 instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			 sprintf(instrArray[cptInstr], "AFC %d %d\n",addr, $1);
+			 cptInstr++;
 			 eip++;
 			 $$ = addr;
 			}	 
     	| T_FLOAT
 			{ int addr = getFreeAddress(mem, getTypeByName("float"));
 			 printf("0x%d AFC %d %f\n", eip,addr, $1);
-			 char * data = malloc(sizeof(char) * MAX_SIZE);
-			 sprintf(data, "AFC %d %d\n",addr, $1);
-			 save_line(data);
+			 instrArray[cptInstr] = malloc(sizeof(char) * MAX_SIZE);
+			 sprintf(instrArray[cptInstr], "AFC %d %d\n",addr, $1);
+			 cptInstr++;
 			 eip++;
 			 $$ = addr;
 			}	
@@ -365,13 +377,13 @@ CONDITION:
 
 /* If; Else If; Else */
 IF:
-    	T_IF CONDITION CORPS SUITE_IF ;
+    T_IF CONDITION CORPS SUITE_IF ;
 
 SUITE_IF: 
-		T_ELSE T_IF CONDITION CORPS SUITE_IF
-		| T_ELSE CORPS
-		| 
-		;
+	T_ELSE IF
+	| T_ELSE CORPS
+	| 
+	;
 
 WHILE:
 	T_WHILE CONDITION CORPS
@@ -382,5 +394,11 @@ int yyerror(void)
 { fprintf(stderr, "erreur de syntaxe\n"); return 1;}
 
 int main(void){
+	head_table = createHead();
+	global_pointer_zone = initMem(2000,3000);
+	mem = initMem(0,1000);
+	init();
+	lastType = 1;
+	cptInstr = 0;
     yyparse();
 }
