@@ -1,0 +1,86 @@
+#-----------------------------------------------------------
+# PlanAhead v13.4 (64-bit)
+# Build 157570 by hdbuild on Fri Dec 16 12:49:33 MST 2011
+# Start of session at: Wed Apr 14 10:23:00 2021
+# Process ID: 5012
+# Log file: /home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO/planAhead_run_1/planAhead.log
+# Journal file: /home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO/planAhead_run_1/planAhead.jou
+#-----------------------------------------------------------
+start_gui
+source /home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO/pa.fromNcd.tcl
+startgroup
+set_property loc PAD178 [get_ports {In1[0]}]
+endgroup
+set_property loc "" [get_ports [list  {Dout1[1]}]]
+set_property loc "" [get_ports [list  {Dout1[1]}]]
+set_property loc "" [get_ports [list  {Dout1[0]}]]
+set_property loc "" [get_ports [list  {Dout1[2]}]]
+set_property loc "" [get_ports [list  {Dout1[3]}]]
+startgroup
+set_property loc PAD4 [get_ports {Dout2[0]}]
+endgroup
+set_property loc "" [get_ports [list  {Dout2[1]}]]
+set_property loc "" [get_ports [list  {Dout2[0]}]]
+set_property loc "" [get_ports [list  {Dout2[2]}]]
+set_property loc "" [get_ports [list  {Dout2[3]}]]
+startgroup
+set_property loc PAD164 [get_ports {In1[1]}]
+endgroup
+startgroup
+set_property loc PAD163 [get_ports {In1[2]}]
+endgroup
+startgroup
+set_property loc PAD162 [get_ports {In1[3]}]
+endgroup
+startgroup
+set_property loc PAD161 [get_ports {In2[0]}]
+endgroup
+startgroup
+set_property loc PAD161 [get_ports {In2[0]}]
+endgroup
+startgroup
+set_property loc PAD160 [get_ports {In2[1]}]
+endgroup
+startgroup
+set_property loc PAD159 [get_ports {In2[2]}]
+endgroup
+startgroup
+set_property loc PAD154 [get_ports {In2[3]}]
+endgroup
+startgroup
+set_property loc PAD30 [get_ports CK]
+endgroup
+startgroup
+set_property loc PAD2 [get_ports LOAD]
+endgroup
+startgroup
+set_property loc PAD28 [get_ports RST]
+endgroup
+startgroup
+set_property loc PAD142 [get_ports {Dout1[0]}]
+endgroup
+startgroup
+set_property loc PAD141 [get_ports {Dout1[1]}]
+endgroup
+startgroup
+set_property loc PAD140 [get_ports {Dout1[2]}]
+endgroup
+startgroup
+set_property IOSTANDARD {} [get_ports [list {Dout1[0]}]]
+endgroup
+startgroup
+set_property loc PAD139 [get_ports {Dout1[3]}]
+endgroup
+startgroup
+set_property loc PAD130 [get_ports {Dout2[0]}]
+endgroup
+startgroup
+set_property loc PAD129 [get_ports {Dout2[1]}]
+endgroup
+startgroup
+set_property loc PAD126 [get_ports {Dout2[2]}]
+endgroup
+startgroup
+set_property loc PAD125 [get_ports {Dout2[3]}]
+endgroup
+save_design

@@ -1,0 +1,31 @@
+Command line:
+   test_test_ALU_isim_par.exe
+     -simmode  gui
+     -sdfmax  /uut/=netgen/par/test_ALU_timesim.sdf
+     -sdfroot  /uut
+     -simrunnum  0
+     -socket  60131
+
+Wed Apr 14 10:44:05 2021
+
+
+ Elaboration Time: 0.07 sec
+
+ Current Memory Usage: 184.414 Meg
+
+ Total Signals          : 589
+ Total Nets             : 389
+ Total Signal Drivers   : 352
+ Total Blocks           : 163
+ Total Primitive Blocks : 93
+ Total Processes        : 352
+ Total Traceable Variables  : 894
+ Total Scalar Nets and Variables : 6559
+Total Line Count : 1225
+
+ Total Simulation Time: 0.11 sec
+
+ Current Memory Usage: 259.994 Meg
+
+Wed Apr 14 10:46:41 2021
+

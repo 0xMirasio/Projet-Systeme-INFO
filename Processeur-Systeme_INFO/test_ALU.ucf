@@ -1,0 +1,24 @@
+
+
+NET "CK" LOC = V10;
+NET "Dout1[0]" LOC = T11;
+NET "Dout1[1]" LOC = R11;
+NET "Dout1[2]" LOC = N11;
+NET "Dout1[3]" LOC = M11;
+NET "Dout2[0]" LOC = V15;
+NET "Dout2[1]" LOC = U15;
+NET "Dout2[2]" LOC = V16;
+NET "Dout2[3]" LOC = U16;
+NET "In1[0]" LOC = T5;
+NET "In1[1]" LOC = V8;
+NET "In1[2]" LOC = U8;
+NET "In1[3]" LOC = N8;
+NET "In2[0]" LOC = M8;
+NET "In2[1]" LOC = V9;
+NET "In2[2]" LOC = T9;
+NET "In2[3]" LOC = T10;
+NET "LOAD" LOC = C4;
+NET "RST" LOC = A8;
+
+
+NET "Dout1[0]" IOSTANDARD = LVCMOS25;

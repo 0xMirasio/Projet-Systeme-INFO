@@ -1,0 +1,1 @@
+-intstyle "ise" -incremental -lib "secureip" -o "/home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO/test_test_ALU_isim_par.exe" -prj "/home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO/test_test_ALU_par.prj" "work.test_test_ALU" 

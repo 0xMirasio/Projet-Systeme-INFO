@@ -1,0 +1,2 @@
+vhdl work "netgen/par/test_ALU_timesim.vhd"
+vhdl work "test_test_ALU.vhd"
