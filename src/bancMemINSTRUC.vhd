@@ -36,8 +36,15 @@ entity bancMemINSTRUC is
 end bancMemINSTRUC;
 
 architecture Behavioral of bancMemINSTRUC is
-
+	type binstru_struct is ARRAY(0 to 255) of std_logic_vector(7 downto 0);
+	signal binstru : binstru_struct;
+	
 begin
+	process
+		begin
+			wait until CLK'EVENT and CLK='1';
+			OUTD <= binstru(to_integer(unsigned(addr)));
+		end process;
 
 
 end Behavioral;

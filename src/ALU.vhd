@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    10:16:29 04/14/2021 
+-- Create Date:    12:10:01 04/14/2021 
 -- Design Name: 
--- Module Name:    alu - Behavioral 
+-- Module Name:    ALU - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -52,26 +52,33 @@ begin
 	B_ext <= x"00"&B;
 
 	instruct: process
-		begin	
+		begin
+			N <= '0';
+			O <= '0';
+			Z <= '0';
+			C <= '0';
+			
 			case Ctrl_Alu is
 			when "001" => result <= A_ext+B_ext;
 			when "010" => result <= A_ext(7 downto 0)*B_ext(7 downto 0);
 			when "011" => result <= A_ext-B_ext;
 			when others	=>	result <= x"0000" ;
 			end case;
+			
+			if result(15 downto 8) /= x"00" and Ctrl_Alu = "001" then
+				C <= '1';
+			elsif result(15 downto 8) /= x"00" and Ctrl_Alu = "010" then
+				O <= '1';
+			elsif A_ext < B_ext and Ctrl_Alu = "011" then
+				N <= '1';
+			elsif result(15 downto 0) = x"0000" then
+				Z <= '1';
+			end if;
+			
+			
 			S <= result(7 downto 0);
 			
 			wait on Ctrl_Alu, A_ext, B_ext, result;
 	end process;
-	
-	C <= '1' when result > x"FF" and Ctrl_Alu = "001" else
-		  '0';
-	O <= '1' when (result(15 downto 8) /= x"00" and Ctrl_Alu = "010") else
-			'0';		
-	N <= '1' when (A_ext < B_ext and Ctrl_Alu = "011") else
-			'0';
-	Z <= '1' when result(15 downto 0) = x"0000" else
-			'0';
-	
-end Behavioral;
 
+end Behavioral;
