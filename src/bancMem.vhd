@@ -52,8 +52,7 @@ begin
 				else
 					if RW = '1' then -- lecture
 						OUTD <= bmem(TO_INTEGER(unsigned(addr)));
-					end if;
-					if RW = '0' then -- ecriture
+					elsif RW = '0' then -- ecriture
 						bmem(TO_INTEGER(unsigned(addr)))<= IND;
 					end if;
 				end if;
