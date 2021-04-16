@@ -1,8 +1,0 @@
-INTSTYLE=ise
-INFILE=/home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO/test_ALU.ncd
-OUTFILE=/home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO/test_ALU.bit
-FAMILY=Spartan6
-PART=xc6slx16-3csg324
-WORKINGDIR=/home/poncetta/Bureau/VHDL/Processeur-Systeme_INFO
-LICENSE=WebPack
-USER_INFO=176114439_0_0_839
