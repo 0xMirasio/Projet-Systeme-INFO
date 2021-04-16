@@ -8,9 +8,7 @@ Le dépôt contient :
 
 -une grammaire grammaire.y qui à partir des tokens envoyés par regle.lex génère un code ASM correspondant au fichier example.c (code C minimaliste)
 
--TODO : processeur (VHDL)
-
--TODO : proco (FPGA)
+processeur (VHDL) + implémentation FPGA : Voir branche ``` processeur ```
 
 ## Installation
 
