@@ -5,8 +5,8 @@
 
 %%
 
-\{ return T_OPEN_BRAC;
-\} return T_CLOSE_BRAC;
+"{" return T_OPEN_BRAC;
+"}" return T_CLOSE_BRAC;
 const {yylval.v3 = strdup(yytext);return T_CONST_TYPE;}
 int {yylval.v3 = strdup(yytext);return T_INT_TYPE;}
 float {yylval.v3 = strdup(yytext);return T_FLOAT_TYPE;}
@@ -14,13 +14,17 @@ double {yylval.v3 = strdup(yytext);return T_DOUBLE_TYPE;}
 [0-9]+  {yylval.v1 = atoi(yytext); return T_INT;}
 [0-9]+[\.][0-9]+ return T_FLOAT;
 return return T_RETURN;
-\+ return T_ADD;
-\- return T_SUB;
-\* return T_MUL;
-\/ return T_DIV;
-\= return T_EQUALS;
-\( return T_OPEN_PAR;
-\) return T_CLOSE_PAR;
+"+" return T_ADD;
+"-" return T_SUB;
+"*" return T_MUL;
+"/" return T_DIV;
+"+=" return T_ADD_EQ;
+"-=" return T_SUB_EQ;
+"*=" return T_MUL_EQ;
+"/=" return T_DIV_EQ;
+"=" return T_EQUALS;
+"(" return T_OPEN_PAR;
+")" return T_CLOSE_PAR;
 ">" return T_LOGICAL_SUP;
 "<" return T_LOGICAL_INF;
 "&&" return T_LOGICAL_AND;

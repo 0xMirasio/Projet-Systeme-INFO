@@ -9,7 +9,7 @@
 #include <string.h>
 #include "symbol_table.h"
 
-Symbol * createSymbol(int type, char *name, int addr, int depth){
+Symbol *createSymbol(int type, char *name, int addr, int depth){
     Symbol *s = malloc(sizeof(Symbol));
     s->type = type;
     s->name = malloc(strlen(name)+1);
@@ -20,15 +20,15 @@ Symbol * createSymbol(int type, char *name, int addr, int depth){
     return s;
 }
 
-Symbol_table * createHead(void){
-    Symbol_table * table_head = malloc(sizeof(Symbol_table));
+Symbol_table *createHead(void){
+    Symbol_table *table_head = malloc(sizeof(Symbol_table));
     table_head->data = NULL;
     table_head->next = NULL;
     return table_head;
 }
 
-void insertSymbol(Symbol_table * table_head, Symbol * s){
-    Symbol_table * current;
+void insertSymbol(Symbol_table *table_head, Symbol *s){
+    Symbol_table *current;
 
     current = table_head;
     while(current->next != NULL){
@@ -40,9 +40,9 @@ void insertSymbol(Symbol_table * table_head, Symbol * s){
     
 }
 
-void removeSymbol(Symbol_table * table_head, char * name) {
+void removeSymbol(Symbol_table *table_head, char *name) {
     
-    Symbol_table * current;
+    Symbol_table *current;
     
     current = table_head;
     while(current->next != NULL){
@@ -58,10 +58,10 @@ void removeSymbol(Symbol_table * table_head, char * name) {
     }
 }
 
-Symbol * getSymbol(Symbol_table * table_head, char * name){
+Symbol *getSymbol(Symbol_table *table_head, char *name){
    
     
-    Symbol_table * current;
+    Symbol_table *current;
     
     current = table_head;
     while(current->next != NULL){
@@ -75,16 +75,16 @@ Symbol * getSymbol(Symbol_table * table_head, char * name){
     return NULL;
 }
 
-void setInitialized(Symbol * s){
+void setInitialized(Symbol *s){
     s->isInitialized = 1;
 }
 
 
-int isInitialised(Symbol * s){
+int isInitialised(Symbol *s){
     return s->isInitialized;
 }
 
-int getAddress(Symbol * s){
+int getAddress(Symbol *s){
     return s->addr;
 }
 
@@ -96,11 +96,11 @@ type 3 : double
 
 si 0 est renvoyé => problème recherche symbol dans table_head, gerer l'erreur
 */
-int getType(Symbol * s) {
+int getType(Symbol *s) {
     return s->type;
 }
 
-int getTypeByName(char * type) {
+int getTypeByName(char *type) {
     if (strcmp(type, "int")  == 0) {
         return 1;
     }
@@ -113,12 +113,12 @@ int getTypeByName(char * type) {
     return 0;
 }
 
-int getDepth(Symbol * s) {
+int getDepth(Symbol *s) {
     return s->depth;
 }
 
-void print_table(Symbol_table * table_head){
-    Symbol_table * current;
+void print_table(Symbol_table *table_head){
+    Symbol_table *current;
     int i = 0;
 
     printf("-----------------------------------------------------------------------------------\n");
