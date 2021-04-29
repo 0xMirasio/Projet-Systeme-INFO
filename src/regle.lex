@@ -2,7 +2,7 @@
 #include "y.tab.h"
 
 %}
-
+ 
 %%
 
 "{" return T_OPEN_BRAC;
@@ -33,7 +33,7 @@ return return T_RETURN;
 "<=" return T_LOGICAL_INF_EQ; 
 "==" return T_LOGICAL_EQ;
 "!=" return T_LOGICAL_NEQ;
-
+"!" return T_LOGICAL_NOT;
 
 if return T_IF;
 else return T_ELSE;
