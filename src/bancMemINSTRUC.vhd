@@ -19,6 +19,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_STD.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -37,9 +38,7 @@ end bancMemINSTRUC;
 
 architecture Behavioral of bancMemINSTRUC is
 	type binstru_struct is ARRAY(0 to 255) of std_logic_vector(31 downto 0);
-	constant binstru : binstru_struct := (X"06000800", X"06010C00", X"060204003", X"05030100", X"01040001", others=> X"00000000");
-	
-	
+	constant binstru : binstru_struct := (X"06000800", X"06010C00", X"06020400", X"05030100", X"01040001", others=> X"00000000");
 	
 begin
 	process

@@ -42,7 +42,7 @@ end bancMemDATA;
 
 architecture Behavioral of bancMemDATA is
 	type bmem_struct is ARRAY(0 to 255) of std_logic_vector(7 downto 0);
-	signal bmem : bmem_struct;
+	signal bmem : bmem_struct := (others => x"00");
 begin
 	process
 		begin
