@@ -38,7 +38,7 @@ end bancMemINSTRUC;
 
 architecture Behavioral of bancMemINSTRUC is
 	type binstru_struct is ARRAY(0 to 255) of std_logic_vector(31 downto 0);
-	constant binstru : binstru_struct := (X"06000800", X"06010C00", X"06020400", X"05030100", X"01040001", others=> X"00000000");
+	constant binstru : binstru_struct := (X"00000000", X"06000800", X"06010300",X"00000000",X"00000000", X"05020000", X"01030001",  others=> X"00000000");
 	
 begin
 	process
