@@ -18,14 +18,16 @@ package constants is
     constant CONSTANT_OP_COP    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"05";
     constant CONSTANT_OP_AFC    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"06";
 
-    constant CONSTANT_OP_JMP	  : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"07";
-    constant CONSTANT_OP_JMF    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"08";
+    constant CONSTANT_OP_LOAD	  : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"07";
+    constant CONSTANT_OP_STORE    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"08";
 
-    constant CONSTANT_OP_INF    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"09";
-    constant CONSTANT_OP_SUP    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0A";
-
-    constant CONSTANT_OP_EQU    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0B";
-    constant CONSTANT_OP_PRI    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0C";
+--    constant CONSTANT_OP_INF    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"09";
+--    constant CONSTANT_OP_SUP    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0A";
+--
+--    constant CONSTANT_OP_EQU    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0B";
+--    constant CONSTANT_OP_PRI    : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0C";
+	 
+	 
 --        : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0D";
 --        : std_logic_vector(CONSTANT_INSTRU - 1 downto 0) := x"0E";
     

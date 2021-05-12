@@ -93,62 +93,108 @@ architecture Behavioral of processeur is
 	
 	SIGNAL LCMR : STD_LOGIC;
 	SIGNAL LCDE : STD_LOGIC_VECTOR(2 downto 0);
+	SIGNAL LCEM : STD_LOGIC;
+	
 	SIGNAL tempMEMINSTRU : STD_LOGIC_VECTOR(CONSTANT_OUT-1 downto 0);
 	SIGNAL tmpIN : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
+	
 	SIGNAL addr : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	SIGNAL QA : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	SIGNAL QB : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
+	
 	SIGNAL S : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
+	SIGNAL N : STD_LOGIC;
+	SIGNAL O : STD_LOGIC;
+	SIGNAL Z : STD_LOGIC;
+	SIGNAL C : STD_LOGIC;
+	
+	SIGNAL addrDATA : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
+	SIGNAL outDATA : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	
 	
 begin
 my_meminstru : bancMemINSTRUC PORT MAP(addr=>addr, CLK=>CLK, OUTD=>tempMEMINSTRU);
 my_bancReg : bancReg PORT MAP(A=>bLD(3 downto 0), B=>cLD(3 downto 0), Wb=>aMR(3 downto 0), W=>LCMR, DATA=>bMR, RST=>'1', CLK=>CLK, QA=>QA, QB=>QB);
 my_alu: alu PORT MAP(A=>bDE,B=>cDE, Ctrl_Alu=>LCDE, S=>S, N=>OPEN, O=>OPEN, Z=>OPEN, C=>OPEN);
+my_bancMemDATA : bancMemDATA PORT MAP(addr=>addrDATA, IND=>bEM , RW=>LCEM, RST=>RST, CLK=>CLK, OUTD=>outDATA);
 
 	process
 		begin
 			WAIT UNTIL CLK'EVENT AND CLK = '1';
 			if rst = '1' then
+				
+				--Pipeline LI/DL
 				aLD <= tempMEMINSTRU(23 downto 16);
 				bLD <= tempMEMINSTRU(15 downto 8);
 				cLD <= tempMEMINSTRU(7 downto 0);
 				opLD <= tempMEMINSTRU(31 downto 24);
 
+				--Pipeline DI/EX
 				aDE <= aLD; 
 				opDE <= opLD;	
-				if opLD = CONSTANT_OP_COP then
+				if opLD = CONSTANT_OP_COP 
+				or opLD = CONSTANT_OP_ADD
+				or opLD = CONSTANT_OP_SUB
+				or opLD = CONSTANT_OP_MUL then
 					bDE <= QA;
 				else
 					bDE <= bLD; 
 				end if;
 				cDE <= QB;
-
+				
+				--Pipeline EX/MEM
 				aEM <= aDE;
 				opEM <= opDE;
-				if opLD = CONSTANT_OP_ADD then
+				if opDE = CONSTANT_OP_ADD
+				or opDE = CONSTANT_OP_SUB
+				or opDE = CONSTANT_OP_MUL then
 					bEM <= S;
 				else
-					bEM <= bLD; 
+					bEM <= bDE; 
 				end if;
 				
+				if opEM = CONSTANT_OP_STORE then
+					addrDATA <= aEM;
+				else
+					addrDATA <= bEM;
+				end if;
+				
+				--Pipeline Mem/RE
 				aMR <= aEM;
 				opMR <= opEM;
-				bMR <= bEM;
+				if opEM = CONSTANT_OP_LOAD then
+					bMR <= outDATA;
+				else
+					bMR <= bEM;
+				end if;
 
 				addr <= addr + 1;
 			else
 				addr <= x"00";
 			end if;
 	end process;
-	LCDE <= opDE(2 downto 0) when opDE = CONSTANT_OP_ADD ELSE
-				"000";
-				
-	LCMR <= '1' WHEN opMR = CONSTANT_OP_AFC or opMR = CONSTANT_OP_COP or CONSTANT_OP_ADD ELSE 
-	         '0';
 	
-		
-
+	--LC Alu
+	LCDE <= opDE(2 downto 0) 
+		when opDE = CONSTANT_OP_ADD 
+		or opDE = CONSTANT_OP_SUB
+		or opDE = CONSTANT_OP_MUL ELSE
+			"000";
+	
+	--LC MemDATA
+	LCEM <= '0' WHEN opEM = CONSTANT_OP_STORE ELSE 
+		'1';
+				
+	--LC bancReg
+	LCMR <= '1' 
+		WHEN opMR = CONSTANT_OP_AFC 
+		or opMR = CONSTANT_OP_COP 
+		or opMR = CONSTANT_OP_ADD
+		or opMR = CONSTANT_OP_SUB
+		or opMR = CONSTANT_OP_MUL 
+		or opMR = CONSTANT_OP_LOAD ELSE 
+			'0';
+	
 		
 		POUT <= aMR;
 end Behavioral;

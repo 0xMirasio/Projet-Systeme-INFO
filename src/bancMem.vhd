@@ -46,9 +46,9 @@ architecture Behavioral of bancMemDATA is
 begin
 	process
 		begin
-			wait until CLK'EVENT AND CLK ='1';
+			WAIT UNTIL falling_edge(CLK);
 				if RST = '0' then
-					bmem <= (others=> X"00");
+					bmem <= (0=>X"03" , 1 =>X"02", others=> X"00");
 				else
 					if RW = '1' then -- lecture
 						OUTD <= bmem(TO_INTEGER(unsigned(addr)));
