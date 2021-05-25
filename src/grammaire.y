@@ -13,7 +13,6 @@ int yylex();
 int yyeror();
 
 int global_depth = 0;
-int eip = 0;
 int lastType = 1;
 int cptInstr= 0;
 int whileJumpMem;
@@ -57,8 +56,6 @@ char *arrayInstr[MAX_INSTRUCT];
 
 %right T_EQUALS
 
-
-
 %left T_LOGICAL_OR
 %left T_LOGICAL_AND
 %left T_LOGICAL_EQ T_LOGICAL_NEQ
@@ -71,14 +68,11 @@ char *arrayInstr[MAX_INSTRUCT];
 DEBUT:  
 	FUNCTIONS
 		{
-		printArray(arrayInstr, eip);
-		save_all_lines(arrayInstr, cptInstr);
-		print_table(head_table);
-		printf("EIP : %d\n", eip);
-		printf("--------------------------------------------------\n");
+			printArray(arrayInstr, cptInstr);
+			save_all_lines(arrayInstr, cptInstr);
+			print_table(head_table);
 		}
 	; 
-
 
 FUNCTIONS:
 		DECLARE_FUNCTION FUNCTIONS
@@ -86,7 +80,10 @@ FUNCTIONS:
 		;
 
 CORPS: 
-    T_OPEN_BRAC { global_depth++;} INSTRUCTIONS T_CLOSE_BRAC { global_depth--; }
+    T_OPEN_BRAC 
+		{ global_depth++;} 
+	INSTRUCTIONS T_CLOSE_BRAC 
+		{ global_depth--; }
 	;
 
 INSTRUCTIONS: 
@@ -108,7 +105,7 @@ INSTRUCTION:
 RETURN:
 	T_RETURN EXPR 
 		{
-			setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+			setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 			sprintf(arrayInstr[cptInstr++], "PRI %d", $2);
 			$$ = $2;
 		}
@@ -144,7 +141,7 @@ AFFECTATION:
 				}
 				setInitialized(s);
 				int addr = getAddress(s);
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "COP %d %d", addr, $3);
 				$$ = addr;
 			}
@@ -162,7 +159,7 @@ AFFECTATION_EQ:
 				}
 
 				int addr = getAddress(s);
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addr, addr, $3);
 				$$ = addr;
 			}
@@ -175,7 +172,7 @@ AFFECTATION_EQ:
 				}
 
 				int addr = getAddress(s);
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SOU %d %d %d", addr, addr, $3);
 				$$ = addr;
 			}
@@ -188,7 +185,7 @@ AFFECTATION_EQ:
 				}
 
 				int addr = getAddress(s);
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "MUL %d %d %d", addr, addr, $3);
 				$$ = addr;
 			}
@@ -201,7 +198,7 @@ AFFECTATION_EQ:
 				}
 
 				int addr = getAddress(s);
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "DIV %d %d %d", addr, addr, $3);
 				$$ = addr;
 			}
@@ -258,25 +255,25 @@ CALL_SUITEPARAM:
 EXPR: 
 		EXPR T_ADD EXPR
 			{
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", $1, $1, $3);
 				$$ = $1;
 			}
         | EXPR T_SUB EXPR
 			{
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SOU %d %d %d", $1, $1, $3);
 				$$ = $1;
 			}
         | EXPR T_MUL EXPR
 			{
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "MUL %d %d %d", $1, $1, $3);
 				$$ = $1;
 			}
         | EXPR T_DIV EXPR
 			{
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "DIV %d %d %d", $1, $1, $3);
 				$$ = $1;
 			}
@@ -292,7 +289,7 @@ EXPR:
 				int varType = getType(s); 
 				int addr = getAddress(s);
 				int tmp = getFreeAddress(mem, varType);
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "COP %d %d",tmp, addr);
 				$$ = tmp;
 			}
@@ -306,14 +303,14 @@ NUMBER:
     	T_INT 
 			{ 
 				int addr = getFreeAddress(mem, getTypeByName("int"));
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d %d",addr, $1);
 				$$ = addr;
 			}	 
     	| T_FLOAT
 			{ 
 				int addr = getFreeAddress(mem, getTypeByName("float"));
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d %d",addr, $1);		
 				$$ = addr;
 			}	
@@ -328,13 +325,13 @@ CONDITION:
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d 1", addrConst);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addrRes, $1, $3);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrRes, addrRes, addrConst);
 
 				$$ = addrRes;
@@ -345,13 +342,13 @@ CONDITION:
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d 0", addrConst);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addrRes, $1, $3);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrRes, addrRes, addrConst);
 
 				$$ = addrRes;
@@ -360,7 +357,7 @@ CONDITION:
 		| CONDITION T_LOGICAL_EQ CONDITION
 			{
 				int addr = getFreeAddress(mem, getTypeByName("int"));
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addr, $1, $3);		
 				$$ = addr;
 			}
@@ -369,16 +366,16 @@ CONDITION:
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d 1", addrConst);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrRes, $1, $3);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addrRes, addrRes, addrConst);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrRes, addrRes, addrConst);
 				$$ = addrRes;
 			}
@@ -388,19 +385,19 @@ CONDITION:
 				int addrResEq = getFreeAddress(mem, getTypeByName("int"));
 				int addrResSup = getFreeAddress(mem, getTypeByName("int"));
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d 0", addrConst);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrResSup, $1, $3);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrResEq,  $1, $3);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addrResSup, addrResSup, addrResEq);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrResSup, addrResSup, addrConst);
 
 				$$ = addrResSup;
@@ -411,19 +408,19 @@ CONDITION:
 				int addrResEq = getFreeAddress(mem, getTypeByName("int"));
 				int addrResInf = getFreeAddress(mem, getTypeByName("int"));
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d 0", addrConst);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "INF %d %d %d", addrResInf, $1, $3);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrResEq,  $1, $3);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addrResInf, addrResInf, addrResEq);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrResInf, addrResInf, addrConst);
 
 				$$ = addrResInf;
@@ -431,14 +428,14 @@ CONDITION:
 		| CONDITION T_LOGICAL_SUP CONDITION
 			{
 				int addr = getFreeAddress(mem, getTypeByName("int"));
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addr, $1, $3);		
 				$$ = addr;
 			}
 		| CONDITION T_LOGICAL_INF CONDITION
 			{
 				int addr = getFreeAddress(mem, getTypeByName("int"));
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "INF %d %d %d", addr, $1, $3);		
 				$$ = addr;
 			}
@@ -446,10 +443,10 @@ CONDITION:
 			{
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SOU %d %d %d", addrRes, $2, $2);
 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrRes, addrRes, $2);
 				$$ = addrRes;
 			}
@@ -458,7 +455,7 @@ CONDITION:
 		| T_OPEN_PAR AFFECTATION T_CLOSE_PAR
 			{
 				int addr = getFreeAddress(mem, getTypeByName("int")); 
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d 1",addr);		
 				$$ = addr;
 			}
@@ -483,7 +480,7 @@ IF:
     T_IF CONDITION 
 		{
 			$1 = cptInstr;
-			storeJMF(arrayInstr, &cptInstr, $2, &eip, MAX_SIZE);
+			storeJMF(arrayInstr, &cptInstr, $2, MAX_SIZE);
 		}
 	CORPS
 		{
@@ -497,7 +494,7 @@ SUITE_IF:
 	T_ELSE
 		{
 			$1 = cptInstr;
-			storeJMP(arrayInstr, &cptInstr, &eip, MAX_SIZE);
+			storeJMP(arrayInstr, &cptInstr, MAX_SIZE);
 		}
 	IF
 		{
@@ -506,7 +503,7 @@ SUITE_IF:
 	| T_ELSE 
 		{
 			$1 = cptInstr;
-			storeJMP(arrayInstr, &cptInstr, &eip, MAX_SIZE);
+			storeJMP(arrayInstr, &cptInstr, MAX_SIZE);
 		}
 		CORPS
 		{
@@ -514,7 +511,7 @@ SUITE_IF:
 		}
 	| 
 		{
-			setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
+			setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 			strncpy(arrayInstr[cptInstr++], "NOP", 4);
 		}
 	;
@@ -526,11 +523,11 @@ WHILE:
 	CONDITION
 		{
 			whileJumpMem = cptInstr;
-			storeJMF(arrayInstr, &cptInstr, $3, &eip, MAX_SIZE);
+			storeJMF(arrayInstr, &cptInstr, $3, MAX_SIZE);
 		}	
 	CORPS 
 	 	{
-			storeJMP(arrayInstr, &cptInstr, &eip, MAX_SIZE);
+			storeJMP(arrayInstr, &cptInstr, MAX_SIZE);
 			patchLine(arrayInstr, cptInstr-1, $1, CHAR_TO_REPLACE);
 			patchLine(arrayInstr, whileJumpMem, cptInstr, CHAR_TO_REPLACE);
 	 	}
@@ -544,6 +541,5 @@ int main(void){
 	head_table = createHead();
 	global_pointer_zone = initMem(2000,3000);
 	mem = initMem(0,1000);
-	init();
     yyparse();
 }
