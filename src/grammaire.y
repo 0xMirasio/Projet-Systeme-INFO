@@ -444,17 +444,13 @@ CONDITION:
 			}
 		| T_LOGICAL_NOT CONDITION	
 			{
-				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
-				sprintf(arrayInstr[cptInstr++], "AFC %d 1", addrConst);
+				sprintf(arrayInstr[cptInstr++], "SOU %d %d %d", addrRes, $2, $2);
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
-				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addrRes, $2, addrConst);
-
-				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr, &eip);
-				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrRes, addrRes, addrConst);
+				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrRes, addrRes, $2);
 				$$ = addrRes;
 			}
 		| T_OPEN_PAR CONDITION T_CLOSE_PAR
