@@ -47,7 +47,7 @@ begin
 	process
 		begin
 			wait until CK'EVENT AND CK ='1';
-			if RST='1' then 
+			if RST='0' then 
 				cpt <= x"00"; 
 			else
 				if LOAD='1' then

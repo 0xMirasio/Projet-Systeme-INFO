@@ -71,19 +71,6 @@ architecture Behavioral of processeur is
            OUTD : out  STD_LOGIC_VECTOR (7 downto 0));
 	 END COMPONENT;
 
-	
---	COMPONENT Pipeline 
---    Port ( CLK : in  STD_LOGIC;
---           RST : in  STD_LOGIC;
---           Ai : in  STD_LOGIC_VECTOR (CONSTANT_OPERAND-1 downto 0);
---           Bi : in  STD_LOGIC_VECTOR (CONSTANT_OPERAND-1 downto 0);
---           Ci : in  STD_LOGIC_VECTOR (CONSTANT_OPERAND-1 downto 0);
---           OPi : in  STD_LOGIC_VECTOR (CONSTANT_INSTRU downto 0);
---           Ao : out  STD_LOGIC_VECTOR (CONSTANT_OPERAND-1 downto 0);
---           Bo : out  STD_LOGIC_VECTOR (CONSTANT_OPERAND-1 downto 0);
---           Co : out  STD_LOGIC_VECTOR (CONSTANT_OPERAND-1 downto 0);
---           OPo : out  STD_LOGIC_VECTOR (CONSTANT_INSTRU-1 downto 0));
---	END COMPONENT;
 
 	SIGNAL aLD, opLD, bLD, cLD : STD_LOGIC_VECTOR(CONSTANT_OPERAND-1 downto 0) := (others => '0');
 	SIGNAL aDE, opDE, bDE, cDE : STD_LOGIC_VECTOR(CONSTANT_OPERAND-1 downto 0) := (others => '0');
@@ -98,7 +85,7 @@ architecture Behavioral of processeur is
 	SIGNAL tempMEMINSTRU : STD_LOGIC_VECTOR(CONSTANT_OUT-1 downto 0);
 	SIGNAL tmpIN : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	
-	SIGNAL addr : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
+	SIGNAL eip : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	SIGNAL QA : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	SIGNAL QB : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	
@@ -111,66 +98,98 @@ architecture Behavioral of processeur is
 	SIGNAL addrDATA : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	SIGNAL outDATA : STD_LOGIC_VECTOR(CONSTANT_ADDRESS-1 downto 0);
 	
+	SIGNAL clockEN : STD_LOGIC := '1';
 	
 begin
-my_meminstru : bancMemINSTRUC PORT MAP(addr=>addr, CLK=>CLK, OUTD=>tempMEMINSTRU);
+my_meminstru : bancMemINSTRUC PORT MAP(addr=>eip, CLK=>CLK, OUTD=>tempMEMINSTRU);
 my_bancReg : bancReg PORT MAP(A=>bLD(3 downto 0), B=>cLD(3 downto 0), Wb=>aMR(3 downto 0), W=>LCMR, DATA=>bMR, RST=>'1', CLK=>CLK, QA=>QA, QB=>QB);
 my_alu: alu PORT MAP(A=>bDE,B=>cDE, Ctrl_Alu=>LCDE, S=>S, N=>OPEN, O=>OPEN, Z=>OPEN, C=>OPEN);
 my_bancMemDATA : bancMemDATA PORT MAP(addr=>addrDATA, IND=>bEM , RW=>LCEM, RST=>RST, CLK=>CLK, OUTD=>outDATA);
 
 	process
 		begin
-			WAIT UNTIL CLK'EVENT AND CLK = '1';
+			WAIT UNTIL rising_edge(CLK);
 			if rst = '1' then
 				
-				--Pipeline LI/DL
-				aLD <= tempMEMINSTRU(23 downto 16);
-				bLD <= tempMEMINSTRU(15 downto 8);
-				cLD <= tempMEMINSTRU(7 downto 0);
-				opLD <= tempMEMINSTRU(31 downto 24);
+				if clockEN = '1' then
+					--Pipeline LI/DL
+					aLD <= tempMEMINSTRU(23 downto 16);
+					bLD <= tempMEMINSTRU(15 downto 8);
+					cLD <= tempMEMINSTRU(7 downto 0);
+					opLD <= tempMEMINSTRU(31 downto 24);
 
-				--Pipeline DI/EX
-				aDE <= aLD; 
-				opDE <= opLD;	
-				if opLD = CONSTANT_OP_COP 
-				or opLD = CONSTANT_OP_ADD
-				or opLD = CONSTANT_OP_SUB
-				or opLD = CONSTANT_OP_MUL then
-					bDE <= QA;
-				else
-					bDE <= bLD; 
-				end if;
-				cDE <= QB;
+					eip <= eip + 1;
 				
-				--Pipeline EX/MEM
-				aEM <= aDE;
-				opEM <= opDE;
-				if opDE = CONSTANT_OP_ADD
-				or opDE = CONSTANT_OP_SUB
-				or opDE = CONSTANT_OP_MUL then
-					bEM <= S;
+				--IF THE CLOCK IS DISABLED	
 				else
-					bEM <= bDE; 
+					-- WE PUT NOP INSTRUCTION IN THE PIPELINE
+					aLD <= x"00";
+					bLD <= x"00";
+					cLD <= x"00";
+					opLD <= x"00";
+	
 				end if;
 				
-				if opEM = CONSTANT_OP_STORE then
-					addrDATA <= aEM;
-				else
-					addrDATA <= bEM;
-				end if;
-				
-				--Pipeline Mem/RE
-				aMR <= aEM;
-				opMR <= opEM;
-				if opEM = CONSTANT_OP_LOAD then
-					bMR <= outDATA;
-				else
-					bMR <= bEM;
-				end if;
-
-				addr <= addr + 1;
 			else
-				addr <= x"00";
+				eip <= x"00";
+			end if;
+	end process;
+	
+	process
+		begin
+		WAIT UNTIL rising_edge(CLK);
+		
+		--Pipeline DI/EX
+			aDE <= aLD; 
+			opDE <= opLD;	
+			if opLD = CONSTANT_OP_COP 
+			or opLD = CONSTANT_OP_ADD
+			or opLD = CONSTANT_OP_SUB
+			or opLD = CONSTANT_OP_MUL 
+			or opLD = CONSTANT_OP_STORE then
+				bDE <= QA;
+			else
+				bDE <= bLD; 
+			end if;
+			cDE <= QB;
+				
+	end process;
+
+	process
+		begin
+		WAIT UNTIL rising_edge(CLK);
+		
+		--Pipeline EX/MEM
+			aEM <= aDE;
+			opEM <= opDE;
+			if opDE = CONSTANT_OP_ADD
+			or opDE = CONSTANT_OP_SUB
+			or opDE = CONSTANT_OP_MUL then
+				bEM <= S;
+			else
+				bEM <= bDE; 
+			end if;
+			
+			if opEM = CONSTANT_OP_STORE then
+				addrDATA <= aEM;
+			else
+				addrDATA <= bEM;
+			end if;
+				
+	end process;
+	
+	
+	process
+		begin
+		WAIT UNTIL rising_edge(CLK);
+		
+		--Pipeline Mem/RE
+			aMR <= aEM;
+			opMR <= opEM;
+			if opEM = CONSTANT_OP_LOAD then
+				bMR <= outDATA;
+			else
+				bMR <= bEM;
 			end if;
 	end process;
 	
@@ -194,8 +213,16 @@ my_bancMemDATA : bancMemDATA PORT MAP(addr=>addrDATA, IND=>bEM , RW=>LCEM, RST=>
 		or opMR = CONSTANT_OP_MUL 
 		or opMR = CONSTANT_OP_LOAD ELSE 
 			'0';
-	
 		
-		POUT <= aMR;
+	clockEN <= '0' 
+		WHEN ( (tempMEMINSTRU(15 downto 8) = aLD or tempMEMINSTRU(7 downto 0) = aLD) and opLD /= CONSTANT_OP_NOP)
+		  or ( (tempMEMINSTRU(15 downto 8) = aDE or tempMEMINSTRU(7 downto 0) = aDE) and opDE /= CONSTANT_OP_NOP)
+		  or ( (tempMEMINSTRU(15 downto 8) = aEM or tempMEMINSTRU(7 downto 0) = aEM) and opEM /= CONSTANT_OP_NOP) 
+		  or ( (tempMEMINSTRU(15 downto 8) = aMR or tempMEMINSTRU(7 downto 0) = aMR) and opMR /= CONSTANT_OP_NOP) 
+		ELSE
+			'1';
+		
+		
+	POUT <= QA;
 end Behavioral;
 
