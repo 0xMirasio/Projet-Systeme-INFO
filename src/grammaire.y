@@ -51,7 +51,7 @@ char *arrayInstr[MAX_INSTRUCT];
 %type <v2> T_FLOAT 
 %type <v3> VAR_TYPE T_VARNAME T_CONST_TYPE T_INT_TYPE T_FLOAT_TYPE T_DOUBLE_TYPE
 %type <v4> NUMBER EXPR RETURN DECLARATION CONDITION
-%type <v4> AFFECTATION AFFECTATION_EQ
+%type <v4> AFFECTATION AFFECTATION_EQ AFFECTATION_DECLARATION SUITE_DECLARATION
 %type <v4> CALL_FUNCTION
 
 %right T_EQUALS
@@ -65,6 +65,8 @@ char *arrayInstr[MAX_INSTRUCT];
 %left T_MUL T_DIV
 
 %%
+
+//Un programme, plusieurs fonctions, le main en dernier
 DEBUT:  
 	FUNCTIONS
 		{
@@ -79,6 +81,12 @@ FUNCTIONS:
 		| 
 		;
 
+
+/* Corps d un programme : 
+	"{
+		suite d'instructions
+	}" 
+*/
 CORPS: 
     T_OPEN_BRAC 
 		{ global_depth++;} 
@@ -91,6 +99,9 @@ INSTRUCTIONS:
 		| 
 		; 
 
+//Les instructions sont :
+// Des déclarations, des affectations (= et +=/-=/...), des appels de fonctions
+// Des if, des while, la fonction printf (non utilisée),  zéro, un, ou plusieurs return
 INSTRUCTION: 
 		DECLARATION T_END_INSTRUCT
 		| AFFECTATION T_END_INSTRUCT
@@ -114,92 +125,145 @@ RETURN:
 DECLARATION: 
 		VAR_TYPE T_VARNAME SUITE_DECLARATION 
 			{
-				Symbol *s;
+				//Dans le cas d'une déclaration simple, on regarde si le symbole n'existe pas déjà.
+				//S'il existe, on affiche une erreur
+				//Sinon on le crée et on renvoie son adresse
+				Symbol *s = getSymbol(head_table, $2);
+				if(s != NULL){
+					printf("error : var \"%s\" already exists\n", $2);
+					exit(1);
+				}
 				int addr = getFreeAddress(global_pointer_zone, lastType);
 				s = createSymbol(lastType, $2, addr, global_depth);
 				insertSymbol(head_table, s);
 				$$ = addr;
 			}
-		| VAR_TYPE AFFECTATION SUITE_DECLARATION {$$ = $2;}
+		| VAR_TYPE AFFECTATION_DECLARATION SUITE_DECLARATION {$$ = $2;}
 		; 
 
 SUITE_DECLARATION:
-		T_COMA T_VARNAME SUITE_DECLARATION 
-		| T_COMA AFFECTATION SUITE_DECLARATION 
+		T_COMA T_VARNAME SUITE_DECLARATION
+			{
+				//Dans le cas d'une déclaration simple, on regarde si le symbole n'existe pas déjà.
+				//S'il existe, on affiche une erreur
+				//Sinon on le crée et on renvoie son adresse
+				Symbol *s = getSymbol(head_table, $2);
+				if(s != NULL){
+					printf("error : var \"%s\" already exists\n", $2);
+					exit(1);
+				}
+				int addr = getFreeAddress(global_pointer_zone, lastType);
+				s = createSymbol(lastType, $2, addr, global_depth);
+				insertSymbol(head_table, s);
+				$$ = addr;
+			} 
+		| T_COMA AFFECTATION_DECLARATION SUITE_DECLARATION {$$ = $2;} 
 		| 
 		;
 
-//Affectation simple, aussi utilisée dans les déclarations
+AFFECTATION_DECLARATION:
+	T_VARNAME T_EQUALS EXPR	
+		{
+			//Dans le cas d'une affectation dans une déclaration, 
+			//on regarde si le symbole n'existe pas déjà.
+			//S'il existe, on affiche une erreur
+			//Sinon on le crée, on lui affecte la valeur de l'expression et on renvoie son adresse
+			Symbol *s = getSymbol(head_table, $1);
+			if(s != NULL){
+				printf("error : var \"%s\" already exists\n", $1);
+				exit(1);
+			}
+			int addr = getFreeAddress(global_pointer_zone, lastType);
+			s = createSymbol(lastType, $1, addr, global_depth);
+			setInitialized(s);
+			insertSymbol(head_table, s);
+
+			setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
+			sprintf(arrayInstr[cptInstr++], "COP %d %d", addr, $3);
+			freeAddress(mem, $3, 1);
+			$$ = addr;
+		}
+	;
+
+//Affectation hors d'une déclaration
 AFFECTATION: 
 		T_VARNAME T_EQUALS EXPR
 			{
+				//Dans le cas d'une affectation hors déclaration,
+				//On regarde si le symbole existe.
+				//S'il n'existe pas, on affiche une erreur
+				//Sinon on affecte normalement
 				Symbol *s = getSymbol(head_table, $1);
 				if(s == NULL){
-					int addrSym = getFreeAddress(global_pointer_zone, lastType);
-					s = createSymbol(lastType, $1, addrSym, global_depth);
-					insertSymbol(head_table, s);
+					printf("error : var \"%s\" is not declared\n", $1);
+					exit(1);
 				}
 				setInitialized(s);
 				int addr = getAddress(s);
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "COP %d %d", addr, $3);
+				freeAddress(mem, $3, 1);
 				$$ = addr;
 			}
 		;
 
-
 // opérateurs "+=, -=, *=, /=" 
+//Il faut que le symbole existe et soit déjà initialisé pour utiliser ces opérateurs
 AFFECTATION_EQ:
 		T_VARNAME T_ADD_EQ EXPR
-			{
+			{	
 				Symbol *s = getSymbol(head_table, $1);
 				if(s == NULL || !isInitialised(s)){
-					printf("Var \"%s\" not initialised\n", $1);
+					printf("error : var \"%s\" not initialised\n", $1);
 					exit(1);
 				}
 
 				int addr = getAddress(s);
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addr, addr, $3);
+				freeAddress(mem, $3, 1);
 				$$ = addr;
 			}
 		| T_VARNAME T_SUB_EQ EXPR
 			{
 				Symbol *s = getSymbol(head_table, $1);
 				if(s == NULL || !isInitialised(s)){
-					printf("Var \"%s\" not initialised\n", $1);
+					printf("error : var \"%s\" not initialised\n", $1);
 					exit(1);
 				}
 
 				int addr = getAddress(s);
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SOU %d %d %d", addr, addr, $3);
+				freeAddress(mem, $3, 1);
 				$$ = addr;
 			}
 		| T_VARNAME T_MUL_EQ EXPR
 			{
 				Symbol *s = getSymbol(head_table, $1);
 				if(s == NULL || !isInitialised(s)){
-					printf("Var \"%s\" not initialised\n", $1);
+					printf("error : var \"%s\" not initialised\n", $1);
 					exit(1);
 				}
 
 				int addr = getAddress(s);
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "MUL %d %d %d", addr, addr, $3);
+				freeAddress(mem, $3, 1);
 				$$ = addr;
 			}
 		| T_VARNAME T_DIV_EQ EXPR
 			{
 				Symbol *s = getSymbol(head_table, $1);
 				if(s == NULL || !isInitialised(s)){
-					printf("Var \"%s\" not initialised\n", $1);
+					printf("error : var \"%s\" not initialised\n", $1);
 					exit(1);
 				}
 
 				int addr = getAddress(s);
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "DIV %d %d %d", addr, addr, $3);
+				freeAddress(mem, $3, 1);
 				$$ = addr;
 			}
 		;
@@ -257,30 +321,35 @@ EXPR:
 			{
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", $1, $1, $3);
+				freeAddress(mem, $3, 1);
 				$$ = $1;
 			}
         | EXPR T_SUB EXPR
 			{
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SOU %d %d %d", $1, $1, $3);
+				freeAddress(mem, $3, 1);
 				$$ = $1;
 			}
         | EXPR T_MUL EXPR
 			{
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "MUL %d %d %d", $1, $1, $3);
+				freeAddress(mem, $3, 1);
 				$$ = $1;
 			}
         | EXPR T_DIV EXPR
 			{
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "DIV %d %d %d", $1, $1, $3);
+				freeAddress(mem, $3, 1);
 				$$ = $1;
 			}
         | T_OPEN_PAR EXPR T_CLOSE_PAR
 			{$$ = $2;}
     	| T_VARNAME 
 			{
+				//Il faut que le symbole existe et soit initialisé pour l'utiliser dans une expression
 				Symbol *s = getSymbol(head_table, $1);
 				if(s == NULL || !isInitialised(s)){
 					printf("Var \"%s\" not initialised\n", $1);
