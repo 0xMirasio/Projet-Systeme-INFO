@@ -277,7 +277,14 @@ VAR_TYPE:
 
 /* Function declaration */
 DECLARE_FUNCTION: 
-		VAR_TYPE T_VARNAME T_OPEN_PAR DECLARE_PARAMETERS T_CLOSE_PAR CORPS
+		VAR_TYPE T_VARNAME
+			{
+				if(strcmp($2, "main") != 0){
+					printf("error : only main function is accepted\n");
+					exit(1);
+				}
+			}
+		T_OPEN_PAR DECLARE_PARAMETERS T_CLOSE_PAR CORPS
 		;
 
 DECLARE_PARAMETERS: 
@@ -395,10 +402,10 @@ CONDITION:
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
-				sprintf(arrayInstr[cptInstr++], "AFC %d 1", addrConst);
+				sprintf(arrayInstr[cptInstr++], "AFC %d 0", addrConst);
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
-				sprintf(arrayInstr[cptInstr++], "ADD %d %d %d", addrRes, $1, $3);
+				sprintf(arrayInstr[cptInstr++], "MUL %d %d %d", addrRes, $1, $3);
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrRes, addrRes, addrConst);
@@ -568,7 +575,7 @@ CONDITION:
 				$$ = addr;
 			}
     	| EXPR
-			{$$ = $1}
+			{$$ = $1;}
 		;
 
 
