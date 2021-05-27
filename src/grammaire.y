@@ -125,9 +125,9 @@ RETURN:
 DECLARATION: 
 		VAR_TYPE T_VARNAME SUITE_DECLARATION 
 			{
-				//Dans le cas d'une déclaration simple, on regarde si le symbole n'existe pas déjà.
-				//S'il existe, on affiche une erreur
-				//Sinon on le crée et on renvoie son adresse
+				/*Dans le cas d'une déclaration simple, on regarde si le symbole n'existe pas déjà.
+				  S'il existe, on affiche une erreur
+				  Sinon on le crée et on renvoie son adresse */
 				Symbol *s = getSymbol(head_table, $2);
 				if(s != NULL){
 					printf("error : var \"%s\" already exists\n", $2);
@@ -144,9 +144,9 @@ DECLARATION:
 SUITE_DECLARATION:
 		T_COMA T_VARNAME SUITE_DECLARATION
 			{
-				//Dans le cas d'une déclaration simple, on regarde si le symbole n'existe pas déjà.
-				//S'il existe, on affiche une erreur
-				//Sinon on le crée et on renvoie son adresse
+				/*Dans le cas d'une déclaration simple, on regarde si le symbole n'existe pas déjà.
+				  S'il existe, on affiche une erreur
+				  Sinon on le crée et on renvoie son adresse */
 				Symbol *s = getSymbol(head_table, $2);
 				if(s != NULL){
 					printf("error : var \"%s\" already exists\n", $2);
@@ -164,10 +164,10 @@ SUITE_DECLARATION:
 AFFECTATION_DECLARATION:
 	T_VARNAME T_EQUALS EXPR	
 		{
-			//Dans le cas d'une affectation dans une déclaration, 
-			//on regarde si le symbole n'existe pas déjà.
-			//S'il existe, on affiche une erreur
-			//Sinon on le crée, on lui affecte la valeur de l'expression et on renvoie son adresse
+			/*Dans le cas d'une affectation dans une déclaration, 
+			  on regarde si le symbole n'existe pas déjà.
+			  S'il existe, on affiche une erreur
+			  Sinon on le crée, on lui affecte la valeur de l'expression et on renvoie son adresse */
 			Symbol *s = getSymbol(head_table, $1);
 			if(s != NULL){
 				printf("error : var \"%s\" already exists\n", $1);
@@ -189,10 +189,10 @@ AFFECTATION_DECLARATION:
 AFFECTATION: 
 		T_VARNAME T_EQUALS EXPR
 			{
-				//Dans le cas d'une affectation hors déclaration,
-				//On regarde si le symbole existe.
-				//S'il n'existe pas, on affiche une erreur
-				//Sinon on affecte normalement
+				/*Dans le cas d'une affectation hors déclaration,
+				  On regarde si le symbole existe.
+				  S'il n'existe pas, on affiche une erreur
+				  Sinon on affecte normalement */
 				Symbol *s = getSymbol(head_table, $1);
 				if(s == NULL){
 					printf("error : var \"%s\" is not declared\n", $1);
@@ -279,6 +279,7 @@ VAR_TYPE:
 DECLARE_FUNCTION: 
 		VAR_TYPE T_VARNAME
 			{
+				//On affiche une erreur si on détecte une autre fonction que le main
 				if(strcmp($2, "main") != 0){
 					printf("error : only main function is accepted\n");
 					exit(1);
@@ -323,6 +324,7 @@ CALL_SUITEPARAM:
 
 
 /* Arithmetic expression*/
+//Pour 
 EXPR: 
 		EXPR T_ADD EXPR
 			{
@@ -398,6 +400,8 @@ NUMBER:
 CONDITION:
 		CONDITION T_LOGICAL_AND CONDITION
 			{
+				/*ET logique : on multiplie les deux conditions et on compare le résultat à 0
+				  Le résultat est égal à 1 si les deux conditions sont vraies */
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
@@ -419,6 +423,8 @@ CONDITION:
 
 		| CONDITION T_LOGICAL_OR CONDITION
 			{
+				/*OU logique : on additionne les deux conditions, on compare le résultat à 0 
+				  Le résultat est égal à 1 si au moins une des deux conditions est vraie */
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
@@ -440,6 +446,7 @@ CONDITION:
 
 		| CONDITION T_LOGICAL_EQ CONDITION
 			{
+				//Instruction EQU
 				int addr = getFreeAddress(mem, getTypeByName("int"));
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addr, $1, $3);	
@@ -451,6 +458,11 @@ CONDITION:
 			}
 		| CONDITION T_LOGICAL_NEQ CONDITION
 			{
+				/*	NOT EQUALS : on regarde si les conditions sont égales.
+					On additionne 1 au résultat précédent.
+					On compare le nouveau résultat à 1.
+					Si les conditions sont égales 			-> 1 -> 1+1 == 1 -> 0
+					Si les conditions ne sont pas égales 	-> 0 -> 0+1 == 1 -> 1 */
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
@@ -474,6 +486,11 @@ CONDITION:
 			}
 		| CONDITION T_LOGICAL_SUP_EQ CONDITION
 			{
+				/*SUP OR EQUALS : on teste les 2 conditions SUP et EQU
+				  Puis, comme pour le OU logique, on additionne les résultats de ces deux conditions
+				  et on compare le nouveau résultat à 0
+				  Si une des deux conditions est vraie, le résultat est égal à 1
+				*/
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrResEq = getFreeAddress(mem, getTypeByName("int"));
 				int addrResSup = getFreeAddress(mem, getTypeByName("int"));
@@ -503,6 +520,11 @@ CONDITION:
 			}
 		| CONDITION T_LOGICAL_INF_EQ CONDITION
 			{
+				/*INF OR EQUALS : on teste les 2 conditions INF et EQU
+				  Puis, comme pour le OU logique, on additionne les résultats de ces deux conditions
+				  et on compare le nouveau résultat à 0
+				  Si une des deux conditions est vraie, le résultat est égal à 1
+				*/
 				int addrConst = getFreeAddress(mem, getTypeByName("int"));
 				int addrResEq = getFreeAddress(mem, getTypeByName("int"));
 				int addrResInf = getFreeAddress(mem, getTypeByName("int"));
@@ -531,6 +553,7 @@ CONDITION:
 			}
 		| CONDITION T_LOGICAL_SUP CONDITION
 			{
+				//Instruction SUP
 				int addr = getFreeAddress(mem, getTypeByName("int"));
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addr, $1, $3);	
@@ -542,6 +565,7 @@ CONDITION:
 			}
 		| CONDITION T_LOGICAL_INF CONDITION
 			{
+				//Instruction INF
 				int addr = getFreeAddress(mem, getTypeByName("int"));
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "INF %d %d %d", addr, $1, $3);	
@@ -553,6 +577,10 @@ CONDITION:
 			}
 		| T_LOGICAL_NOT CONDITION	
 			{
+				/* NOT X : On soustrait la condition à elle même,
+			      Puis on regarde si le résultat est égal à la condition
+				  Si condition = 1 -> 1-1 == 1 -> 0
+				  Si condition = 0 -> 0-0 == 0 -> 1 */
 				int addrRes = getFreeAddress(mem, getTypeByName("int"));
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
@@ -569,6 +597,7 @@ CONDITION:
 			{ $$ = $2; }
 		| T_OPEN_PAR AFFECTATION T_CLOSE_PAR
 			{
+				//Une affectation est toujours vraie
 				int addr = getFreeAddress(mem, getTypeByName("int")); 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "AFC %d 1",addr);		
