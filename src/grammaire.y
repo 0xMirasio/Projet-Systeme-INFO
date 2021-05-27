@@ -403,6 +403,10 @@ CONDITION:
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrRes, addrRes, addrConst);
 
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+				freeAddress(mem, addrConst, 1);
+
 				$$ = addrRes;
 			}
 
@@ -420,6 +424,10 @@ CONDITION:
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrRes, addrRes, addrConst);
 
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+				freeAddress(mem, addrConst, 1);
+
 				$$ = addrRes;
 			}
 
@@ -427,7 +435,11 @@ CONDITION:
 			{
 				int addr = getFreeAddress(mem, getTypeByName("int"));
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
-				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addr, $1, $3);		
+				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addr, $1, $3);	
+
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+
 				$$ = addr;
 			}
 		| CONDITION T_LOGICAL_NEQ CONDITION
@@ -446,6 +458,11 @@ CONDITION:
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrRes, addrRes, addrConst);
+
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+				freeAddress(mem, addrConst, 1);
+
 				$$ = addrRes;
 			}
 		| CONDITION T_LOGICAL_SUP_EQ CONDITION
@@ -468,6 +485,12 @@ CONDITION:
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrResSup, addrResSup, addrConst);
+
+
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+				freeAddress(mem, addrConst, 1);
+				freeAddress(mem, addrResEq, 1);
 
 				$$ = addrResSup;
 			}
@@ -492,20 +515,33 @@ CONDITION:
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addrResInf, addrResInf, addrConst);
 
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+				freeAddress(mem, addrConst, 1);
+				freeAddress(mem, addrResEq, 1);
+
 				$$ = addrResInf;
 			}
 		| CONDITION T_LOGICAL_SUP CONDITION
 			{
 				int addr = getFreeAddress(mem, getTypeByName("int"));
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
-				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addr, $1, $3);		
+				sprintf(arrayInstr[cptInstr++], "SUP %d %d %d", addr, $1, $3);	
+
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+
 				$$ = addr;
 			}
 		| CONDITION T_LOGICAL_INF CONDITION
 			{
 				int addr = getFreeAddress(mem, getTypeByName("int"));
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
-				sprintf(arrayInstr[cptInstr++], "INF %d %d %d", addr, $1, $3);		
+				sprintf(arrayInstr[cptInstr++], "INF %d %d %d", addr, $1, $3);	
+
+				freeAddress(mem, $1, 1);
+				freeAddress(mem, $3, 1);
+
 				$$ = addr;
 			}
 		| T_LOGICAL_NOT CONDITION	
@@ -517,6 +553,9 @@ CONDITION:
 
 				setUpArrayInstr(arrayInstr, MAX_SIZE, cptInstr);
 				sprintf(arrayInstr[cptInstr++], "EQU %d %d %d", addrRes, addrRes, $2);
+
+				freeAddress(mem, $2, 1);
+
 				$$ = addrRes;
 			}
 		| T_OPEN_PAR CONDITION T_CLOSE_PAR
@@ -528,18 +567,8 @@ CONDITION:
 				sprintf(arrayInstr[cptInstr++], "AFC %d 1",addr);		
 				$$ = addr;
 			}
-    	| T_VARNAME
-			{
-				Symbol *s = getSymbol(head_table, $1);
-				if(s == NULL || !isInitialised(s)){ 
-					printf("Var \"%s\" not initialised\n", $1);
-					exit(1);
-				}
-				int addr = getAddress(s);
-				$$ = addr;				
-			}
-    	| NUMBER
-			{ $$ = $1; }
+    	| EXPR
+			{$$ = $1}
 		;
 
 
